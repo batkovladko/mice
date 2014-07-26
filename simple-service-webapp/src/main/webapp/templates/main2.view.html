@@ -1,0 +1,65 @@
+﻿<div class="panel panel-default">
+<div class="panel-heading">
+	<span ng-show='!dataLoading'>Добави филтър</span>
+	<span ng-show="dataLoading"><img src="images/loading.gif"  height="24" width="24" style="valign:top"/>Зареждане...
+	</span>  
+</div>
+
+  <div class="panel-body" ng-show="!dataLoading">
+	  <form role="form" name="propertyGroupFormNg" novalidate>
+		  <div class="form-group">
+			<label for="name">Име</label>
+			<input ng-model="name" name="name" class="form-control"
+			 ng-class="getCss(propertyGroupFormNg.name)" ng-maxlength="30" required
+			 placeholder="Пример: Екстри към обекта" >
+			<span class="errorMessage" ng-show="propertyGroupFormNg.name.$dirty && propertyGroupFormNg.name.$error.required">Задължително поле!</span>
+			<span class="errorMessage" ng-show="propertyGroupFormNg.name.$dirty && propertyGroupFormNg.name.$error.maxlength">Максимална дължина не повече от 30 символа!</span>
+		  </div>
+		  <label>Тип на филтъра</label>
+		  <div class="checkbox">
+			<label>
+			  <input type="radio" ng-model="type" value="checkbox"> Бутон с повече от един избор (Checkbox бутони)
+			</label>
+		  </div>
+		  <div class="checkbox">
+			<label>
+			  <input type="radio" ng-model="type" value="radiobutton"> Бутон с единичен избор (Radio бутон)
+			</label>
+		  </div>
+		  <div class="checkbox">
+			<label>
+			  <input type="radio" ng-model="type" value="dropdown"> Падащ списък (Drop-down)
+			</label>
+		  </div>
+		  <div class="checkbox">
+			<label>
+			  <input type="radio" ng-model="type" value="simpletext"> Текст за въвеждане (Text поле)
+			</label>
+		  </div>
+	  <button ng-disabled="!type || !name" type="button" class="btn btn-default" ng-click="addPropertyGroup()">Запази</button>
+	  </form>
+  </div>
+
+	<div class="panel-heading">
+	<img src="images/loading.gif" ng-show="dataLoading" height="30" width="30"/>
+	Списък на всички филтри</div>
+	<div class="panel-body">
+		<div ng-repeat="property in propertyGroups">
+			<form role="form" name="myFormNg" novalidate>
+				<input required type="text" id="attrValue" name="attrValue" ng-model="property.name"  
+						ng-maxlength="30" ng-class="getCss(myFormNg.attrValue)">
+				
+						<button ng-class="getButtonCss(property.processing==true || myFormNg.$pristine || (myFormNg.$dirty && myFormNg.$invalid))" 
+							ng-click="updatePropertyGroup($index, $event)" 
+							ng-disabled="property.processing==true || myFormNg.$pristine || (myFormNg.$dirty && myFormNg.$invalid)" title="Запиши"></button>
+
+						<button class="deleteButton" ng-click="deletePropertyGroup($index)"
+							ng-disabled="property.processing==true" title="Изтрий"></button>
+						<img src="images/loading.gif" ng-show="property.processing" height="30" width="30"/>
+						<div>
+					<span class="errorMessage" ng-show="myFormNg.attrValue.$dirty && myFormNg.attrValue.$error.required">Задължително поле!</span>
+					<span class="errorMessage" ng-show="myFormNg.attrValue.$dirty && myFormNg.attrValue.$error.maxlength">Максимална дължина не повече от 30 символа!</span>
+			</form>
+		</div>
+	</div>
+</div>

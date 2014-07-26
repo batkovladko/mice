@@ -1,0 +1,23 @@
+body{
+margin: 0 auto;					align the display at the center
+text-align: center;				align the display at the center
+}
+
+/* #loading */
+/* { */
+/* width:32px; */
+/* height:32px; */
+/* background: url('../images/loading.gif'); */
+/* display:none; */
+/* margin: 0 auto;					align the display at the center */
+/* text-align: center;				align the display at the center */
+/* } */
+
+#my_iframe
+{
+display:none;
+border: 0px;
+overflow:hidden;
+margin: 0 auto;					/*align the display at the center*/
+text-align: center;				/*align the display at the center*/
+}

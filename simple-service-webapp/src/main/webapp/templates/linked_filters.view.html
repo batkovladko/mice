@@ -1,0 +1,96 @@
+<div class="panel panel-default">
+	<div class="panel-heading">Свързани филтри</div>
+	<script>
+		function handleMouseOverDetails(object) {
+			var id = object.id;
+			console.log("mouseover id=" +  id);
+			var realId = "tooltipfreeFilter_" + id.substring(id.indexOf("_") + 1, id.length);
+			var parent = document.getElementById(id);
+			var details = document.getElementById(realId);
+
+			var top = parent.offsetTop + 20;
+			var left = parent.offsetLeft + 50;
+
+			parent.style.zIndex = 0;
+			details.style.zIndex = 100;
+			details.style.top = top + "px";
+			details.style.left = left + "px";
+			$("#" + realId).fadeIn(200, function() {
+			});
+		}
+
+		function handleMouseOutDetails(object) {
+			var id = object.id;
+			var realId = "tooltipfreeFilter_" + id.substring(id.indexOf("_") + 1, id.length);
+			var details = document.getElementById(realId);
+			$("#" + realId).fadeOut(200, function() {
+			});
+		}
+		function generateContent(c) {
+			alert(c);
+		};
+	</script>
+	<div class="panel-body">
+		<div class="form-group">
+			<div id="parentFilter" class="parentFilter">
+			<label>Базов Филтър</label>
+			<!-- 
+			Edit/New
+			 -->
+			<select ng-model="selectedFilter"
+				ng-options="property.name for property in propertyGroups"
+				ng-change='loadParentFilterAttributes("filterAttributes");'
+				id="selectedFilter"
+				>
+			</select> <img src="images/loading.gif" ng-show="dataLoading" height="30"
+				width="30" />
+				</div>
+			<div>
+				<div id="info" style="background-color: #f0f0ff; font-weight: bold;"></div>
+				<div id="content" style="width: 100%;">
+					<div id="filterAttributes" style="float: left; width: 100%"></div>
+				</div>
+				<div id="freeFiltersSection" ng-show="attributes != null && attributes.length>0" class="freeFiltersSection"
+					 ondrop="Utils.dropAndDisconnectFilters(event, 'freeFilter',
+					 				angular.element($('#parentFilter')).scope(), 
+					 				function() {angular.element($('#parentFilter')).scope().loadParentFilterAttributes('filterAttributes')})" 
+					 ondragover="Utils.allowDrop(event)"> 
+					<label>Несвързани филтри:</label>
+					<hr>
+					<div class="form-group" ng-repeat="pg in freePropertyGroups">
+						<span ng-show="pg.id!=selectedFilter.id" id="freeFilter_{{pg.id}}" draggable="true" class="freeFilter"
+							ondragstart="Utils.drag(event)"
+							onmouseover='handleMouseOverDetails(this)'
+							onmouseout="handleMouseOutDetails(this)"> {{pg.name}}</span>
+						<div id="tooltipfreeFilter_{{pg.id}}"
+							style="display: none;" class="tooltipFilter">
+							<div ng-switch on="pg.type">
+								<div ng-switch-when="dropdown"><select><option>Падащ списък (Drop-down)</option></select>
+										<div ng-repeat="item in pg.properties" class="tooltipInput">{{item.value}}</div>
+								</div>
+								<div ng-switch-when="radiobutton">
+									<span  class="tooltipFilterTitle"><b>Бутон с единичен избор (Radio бутон):</b></span>
+									<div ng-repeat="prop in pg.properties">
+										<input disabled="disabled" type="radio" name="{{pg.id}}" value="{{prop.value}}" class="tooltipInput">&nbsp;{{prop.value}}
+									</div>
+								</div>
+								<div ng-switch-when="checkbox" >
+								<span  class="tooltipFilterTitle"><b>Бутон с повече от един избор (Checkbox бутони)</b></span>
+									<div ng-repeat="prop in pg.properties">
+										<input disabled="disabled" type="checkbox" name="{{pg.id}}" value="{{prop.value}}" class="tooltipInput">&nbsp;{{prop.value}}
+									</div>
+								</div>
+								<div ng-switch-when="simpletext"><b>Текст за въвеждане (Text поле)</b></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div
+				ng-show="selectedFilter.id!==undefined && selectedFilter.type=='simpletext'">Филтри
+				от тип "Input за въвеждане" нямат атрибути.</div>
+		</div>
+	</div>
+</div>
+
+<!-- Client should check and disallow replace of connected filter -->

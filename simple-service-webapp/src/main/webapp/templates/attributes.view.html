@@ -1,0 +1,51 @@
+﻿<div class="panel panel-default">
+  <div class="panel-heading">Управление на атрибути към филтър</div>
+  <div class="panel-body">
+  			<div class="form-group">
+				<label>Избери филтър </label>
+				<select ng-model="selectedFilter" ng-options="property.name for property in propertyGroups" ng-change="loadAttributes()">
+				</select>
+				<img src="images/loading.gif" ng-show="dataLoading" height="30" width="30"/>
+			<div>
+		  	
+		<div id="attr_group" ng-show="selectedFilter.id!=undefined && selectedFilter.type!='simpletext'">
+			<div class="form-group" ng-repeat="attribute in attributes">
+				<form role="form" name="myFormNg" novalidate>
+					<input required type="text" id="attrValue" name="attrValue" ng-model="attribute.value"  
+						ng-maxlength="30" ng-class="getCss(myFormNg.attrValue)">
+				
+						<button ng-class="getButtonCss(attribute.processing==true || myFormNg.$pristine || (myFormNg.$dirty && myFormNg.$invalid))"
+							ng-click="myForm.updateProperty($index, $event)" 
+							ng-disabled="attribute.processing==true || myFormNg.$pristine || (myFormNg.$dirty && myFormNg.$invalid)" title="Запиши"></button>
+
+						<button class="deleteButton" ng-click="deleteProperty($index)"
+							ng-disabled="attribute.processing==true" title="Изтрий"></button>
+						<img src="images/loading.gif" ng-show="attribute.processing" height="30" width="30"/>
+						<div>
+							<span class="errorMessage" ng-show="myFormNg.attrValue.$dirty && myFormNg.attrValue.$error.required">Задължително поле!</span>
+					<span class="errorMessage" ng-show="myFormNg.attrValue.$dirty && myFormNg.attrValue.$error.maxlength">Максимална дължина не повече от 30 символа!</span>
+				</div>
+				</form>
+			</div>
+			<div class="check-element animate-show addNewProperty"
+				ng-show="selectedFilter.id!==undefined">
+				Добави атрибути към филтъра
+				<form role="form" name="myFormNg2" novalidate>
+					<div class="form-group">
+						<input class="form-control" style="width: 50%" ng-model="name" name="name"
+							placeholder="Атрибут" required ng-maxlength="30" ng-class="getCss(myFormNg2.name)"/>
+						<span class="errorMessage" ng-show="myFormNg2.name.$dirty && myFormNg2.name.$error.required">Задължително поле!</span>
+						<span class="errorMessage" ng-show="myFormNg2.name.$dirty && myFormNg2.name.$error.maxlength">Максимална дължина не повече от 30 символа!</span>
+					</div>
+						<span> <img src="images/loading.gif" ng-show="addProcessing" height="30" width="30" />
+							<button type="button" class="btn btn-default"
+								ng-click="addProperty()" ng-disabled="addProcessing==true || myFormNg2.$pristine || (myFormNg2.$dirty && myFormNg2.$invalid)">Добави</button>
+						</span>
+				</form>
+			</div>
+		</div>
+	</div>
+		
+	<div ng-show="selectedFilter.id!==undefined && selectedFilter.type=='simpletext'">Филтри от тип "Input за въвеждане" нямат атрибути.</div>
+  </div>
+</div>

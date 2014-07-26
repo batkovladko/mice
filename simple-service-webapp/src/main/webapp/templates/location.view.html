@@ -1,0 +1,144 @@
+<script type="text/javascript">
+	this.fields = new Array();
+	function redirect() {
+		var form = document.getElementById('newLocation');
+		var formData = document.getElementById('formData');
+		form.target = 'my_iframe'; //'my_iframe' is the name of the iframe
+		var elements = $('#newLocation').serializeArray();
+		var data = new Object();
+		data.properties = new Array();
+		
+		if (elements) {
+			for (var i = 0; i < elements.length; i++) {
+				var e = elements[i];
+				if (e.name =='formData') {
+					continue;
+				}
+				if (e.name == 'name') {
+					data.name = e.value;
+				} else if (e.name == 'description') {
+					data.description = e.value;
+				} else if (e.name == 'id') {
+					data.id = e.value;
+				} else {
+					data.properties.push(e);
+				}
+			}
+		}
+		
+		formData.setAttribute('value', toJson(data));
+	
+		form.submit();
+
+		var iFrame = document.getElementById("my_iframe");
+		var loading = document.getElementById("loading");
+		iFrame.style.display = "none";
+		iFrame.contentDocument.getElementsByTagName("body")[0].innerHTML = "";
+		loading.style.display = "inline";
+		checkComplete();
+	}
+
+	var checkComplete = function() {
+		var iFrame = document.getElementById("my_iframe").contentDocument.getElementsByTagName("body")[0];
+		var loading = document.getElementById("loading");
+
+		if (iFrame.innerHTML == "") {
+			setTimeout(checkComplete, 1000);
+		} else {
+			if (iFrame.innerHTML && iFrame.innerHTML.indexOf("success") != -1) {
+				loading.style.display = "none";
+				Utils.resetFields(this.fields);
+			} else {
+				loading.style.display = "none";
+				alert("Проблем при създаването на нов обект." );
+			}
+		}
+	};
+	
+	function toJson(data) {
+		return encodeURIComponent(JSON.stringify(data));
+	};
+	$(document).ready(function() {
+		$.ajax({
+			url : "api/v1/propertygroups"
+		}).done(function(data) {
+			var idCounter = {val : 0};
+			$("#formBody").append(Utils.prepareContent(data, false, idCounter, fields));
+			//drawme(data);
+		});
+	});
+	function drawme(data) {
+		var newContent = "";
+		if (data) {
+			for (i = 0; i < data.length; i++) {
+				var e = data[i];
+				var c = "<label>" + e.name + "</label>:<br>"
+				if (e.type == "dropdown") {
+					c += "<select name=" + e.id + ">";
+					if (e.properties) {
+						for (j = 0; j < e.properties.length; j++) {
+							c += "<option value='" + e.properties[j].value + "'>" + e.properties[j].value + "</option>";
+						}
+					}
+					c += "</select>";
+
+				} else if (e.type == "radiobutton") {
+					if (e.properties) {
+						for (j = 0; j < e.properties.length; j++) {
+							c += "<input type='radio' name='" + e.id + "' value='" + e.properties[j].value + "'>"
+									+ e.properties[j].value + "&nbsp;";
+						}
+					}
+				} else if (e.type == "checkbox") {
+					if (e.properties) {
+						for (j = 0; j < e.properties.length; j++) {
+							c += "<input type='checkbox' name='" + e.id + "' value='" + e.properties[j].value + "'>"
+									+ e.properties[j].value + "&nbsp;";
+						}
+					}
+				} else if (e.type == "simpletext") {
+					c += "<input type='text' name='" + e.id + "' value='";
+					if (e.value) {
+						c += e.value;
+					} else {
+						c += "";
+					}
+					c += "'>";
+				}
+				newContent = newContent + c + "<br>";
+			}
+		}
+		$("#formBody").append(newContent);
+	};
+</script>
+<body>
+		<div class="panel panel-default">
+		<form name="newLocation" id="newLocation" name="newLocation" role="form" enctype="multipart/form-data" method="POST" action="api/v1/addnewlocation" novalidate>
+			<input type="hidden" id="formData" name="formData" value="">
+			<div id="status"></div>
+			<div class="panel-heading">
+				<label>Име</label>
+				<input class="form-control-short" name='name' ng-model="name" 
+					required ng-maxlength="30" ng-class="getCss(newLocation.name)"
+					placeholder="Моля въведете име на обекта">
+					<span class="errorMessage" ng-show="newLocation.name.$dirty && newLocation.name.$error.required">Задължително поле!</span>
+					<span class="errorMessage" ng-show="newLocation.name.$dirty && newLocation.name.$error.maxlength">Максимална дължина не повече от 30 символа!</span>
+					<br/><label>Снимка</label>
+			<input id="fileupload" type="file" name="file">
+			<iframe id='my_iframe' name='my_iframe' src=""></iframe>
+			</div>
+			<div class="panel-heading">
+			<label>Описание</label>
+				<input class="form-control" name='description'
+					placeholder="Моля въведете описание на обекта">
+			</div>
+
+			<div class="panel-body" id="formBody"></div>
+			<div>
+				<button type="button" class="btn btn-default" id="submitButton"
+					onclick="redirect()" ng-disabled="locationsLoading==true || newLocation.$pristine || (newLocation.$dirty && newLocation.$invalid)">Запази</button>
+				<img src="images/loading.gif" id="loading" height="30" width="30"
+					style='display: none; valign: top' />
+			</div>
+		</form>
+	</div>

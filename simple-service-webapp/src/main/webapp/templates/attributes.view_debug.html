@@ -1,0 +1,45 @@
+﻿<div class="panel panel-default">
+  <div class="panel-heading">Управление на атрибути към филтър</div>
+  <div class="panel-body">
+		  <div class="form-group">
+			<label >Избери филтър </label>
+			<select ng-model="selectedFilter" ng-options="property.name for property in propertyGroups" ng-change="loadAttributes()">
+			</select>
+		  </div>
+		<div id="attr_group">
+			<div class="form-group" ng-repeat="attribute in attributes">
+			<form role="form" name="myFormNg" novalidate>	
+				<input required type="text" id="attrValue" name="attrValue" ng-model="attribute.value"  
+				ng-class="myForm.getCss(myFormNg.attrValue)" ng-maxlength="15">
+				<span ng-show="myFormNg.attrValue.$dirty && myFormNg.attrValue.$error.required">Задължително поле</span>
+				<button ng-click="myForm.updateProperty($index, $event)" 
+				ng-disabled="attribute.processing==true || myFormNg.$priattribute.processing = false;stine || (myFormNg.$dirty && myFormNg.$invalid)">Запиши</button>
+				<button ng-click="deleteProperty($index)"
+				ng-disabled="attribute.processing==true || myFormNg.$pristine || (myFormNg.$dirty && myFormNg.$invalid)">Изтрий</button>
+				<img src="images/loading.gif" ng-show="attribute.processing" height="30" width="30"/>
+				<img src="images/success.png" ng-show="attribute.processingSuccess==true" height="20" width="20"/>
+				<div>myForm.attrValue: {{myForm.attrValue}}</div>
+				<div>myFormNg.attrValue: {{myFormNg.attrValue}}</div>
+				<div>attribute.value: {{ attribute.value }}</div>
+				<div>attrValue.$valid: {{ attrValue.$valid }}</div>
+				<div>myFormNg.attrValue.$valid: {{ myFormNg.attrValue.$valid }}</div>
+				<div>myFormNg.$pristine: {{ myFormNg.$pristine}}</div>
+				<div>myFormNg.$dirty: {{ myFormNg.$dirty}}</div>
+				<div>myFormNg.$valid: {{ myFormNg.$valid}}</div>
+				</form>
+			</div>
+			
+			<div class="check-element animate-show" ng-show="selectedFilter.id!==undefined"> 
+			Добави атрибути към филтъра
+			</div>
+			<div class="form-group">
+				<input class="form-control" ng-model="name" placeholder="Атрибут">
+			</div>
+		</div>
+		<!-- div class="form-group">
+			<button ng-disabled="!name" type="button" class="btn btn-success" id="addButton" ng-click="addNewRow()">Добави нов ред <span class="glyphicon glyphicon-plus"></span></button>
+		</div-->
+	  <button type="button" class="btn btn-default" ng-click="addProperty()">Добави</button>
+	  
+  </div>
+</div>

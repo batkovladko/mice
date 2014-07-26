@@ -1,0 +1,55 @@
+<div class="panel panel-default">
+	<div class="panel-heading">Свързани филтри</div>
+	<script >
+	<!-- TODO - use labels -->
+		function handleMouseOverDetails(object) {
+			var id = object.id;
+			console.log("Mouseover :" + id);
+			var readlId = "tooltipfreeFilter_" + id.substring(id.indexOf("_")+1,id.length);
+			var offsets = document.getElementById(id).getBoundingClientRect();
+			var top = offsets.top;
+			var left = offsets.left;
+			var right= offsets.left;
+			
+			var details = document.getElementById(readlId);
+			details.top=top+5;
+			details.right=right+10;
+			details.style.display="block";
+		}
+		
+		function handleMouseOutDetails(object) {
+			var id = object.id;
+			console.log("Mouseover :" + id);
+			var readlId = "tooltipfreeFilter_" + id.substring(id.indexOf("_")+1,id.length);
+			var details = document.getElementById(readlId);
+			details.style.display="none";
+		}
+	</script>
+	<div class="panel-body">
+		<div class="form-group">
+			<label>Базов Филтър</label> 
+			<select ng-model="selectedFilter"
+				id="{{property.id}}"
+				ng-options="property.name for property in propertyGroups"
+				ng-change='loadParentFilterAttributes("filterAttributes")'>
+			</select>
+				
+			 <img src="images/loading.gif" ng-show="dataLoading" height="30" width="30" />
+			<div>
+				<div id="info" style="background-color: #f0f0ff; font-weight: bold;"></div>
+				<div id="filterAttributes"></div>
+
+				Other attributes:
+				<div class="form-group"
+					ng-repeat="property in propertyGroups">
+					<div id="freeFilter_{{property.id}}" draggable="true" ondragstart="Utils.drag(event)" onmouseover='handleMouseOverDetails(this)' onmouseout="handleMouseOutDetails(this)">{{property.name}}
+					<div id="tooltipfreeFilter_{{property.id}}" style="display: none; background-color: yellow">Детайли за филтър {{property}}</div>
+					</div>
+				</div>
+			</div>
+			<div
+				ng-show="selectedFilter.id!==undefined && selectedFilter.type=='simpletext'">Филтри
+				от тип "Input за въвеждане" нямат атрибути.</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,34 @@
+﻿<div class="panel panel-default">
+  <div class="panel-heading">Добави филтър </div>
+  <div class="panel-body">
+
+	  <form role="form" ng-submit="addFilterGroup()">
+		  <div class="form-group">
+			<label for="name">Име</label>
+			<input ng-model="name" type="name" class="form-control" placeholder="Пример: Екстри към обекта">
+		  </div>
+		  <label>Тип на филтъра</label>
+		  <div class="checkbox">
+			<label>
+			  <input type="radio" ng-model="type" value="checkbox"> Бутон с повече от един избор (Checkbox бутони)
+			</label>
+		  </div>
+		  <div class="checkbox">
+			<label>
+			  <input type="radio" ng-model="type" value="radio"> Бутон с единичен избор (Radio бутон)
+			</label>
+		  </div>
+		  <div class="checkbox">
+			<label>
+			  <input type="radio" ng-model="type" value="dropdown"> Падащ списък (Drop-down)
+			</label>
+		  </div>
+		  <div class="checkbox">
+			<label>
+			  <input type="radio" ng-model="type" value="simpletext"> Текст за въвеждане (Text поле)
+			</label>
+		  </div>
+	  <button ng-disabled="!type || !name" type="submit" class="btn btn-default">Запази</button>
+	  </form>
+  </div>
+</div>

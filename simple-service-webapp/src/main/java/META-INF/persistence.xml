@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.0"
+	xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
+	<persistence-unit name="simple-service-webapp"
+		transaction-type="RESOURCE_LOCAL">
+		<provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+		<class>org.persistence.Admin</class>
+		<class>org.persistence.PropertyGroups</class>
+		<class>org.persistence.Location</class>
+		<class>org.persistence.LocationProperties</class>
+		<class>org.persistence.Property</class>
+		<properties>
+			<property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver" />
+			<!-- property name="javax.persistence.jdbc.url" value="jdbc:mysql://50.31.138.79:3306/micehost_mice?useInformationSchema=true"/-->
+			<!-- property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/test?useInformationSchema=true"/-->
+			<property name="eclipselink.logging.level" value="INFO" />
+			<!-- property name="javax.persistence.jdbc.user" value="micehost_root" /-->
+			<!-- property name="javax.persistence.jdbc.user" value="root" /-->
+			<!--property name="javax.persistence.jdbc.password" value="[SINUax*X6+K" /-->
+			<!-- property name="javax.persistence.jdbc.password" value="12345678" /-->
+		</properties>
+	</persistence-unit>
+</persistence>

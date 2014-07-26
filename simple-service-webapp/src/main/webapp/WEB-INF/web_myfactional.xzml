@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This web.xml file is not required when using Servlet 3.0 container, 
+	see implementation details http://jersey.java.net/nonav/documentation/latest/jax-rs.html -->
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://java.sun.com/xml/ns/javaee"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	version="2.5">
+	<servlet>
+		<servlet-name>Jersey Web Application</servlet-name>
+		<servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
+		<init-param>
+			<param-name>javax.ws.rs.Application</param-name>
+			<param-value>bg.filterapp.services.App</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>Jersey Web Application</servlet-name>
+		<url-pattern>/api/v1/*</url-pattern>
+	</servlet-mapping>
+	<servlet>
+		<description></description>
+		<display-name>TestServlet</display-name>
+		<servlet-name>TestServlet</servlet-name>
+		<servlet-class>tests.TestServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>TestServlet</servlet-name>
+		<url-pattern>/TestServlet</url-pattern>
+	</servlet-mapping>
+	<welcome-file-list>
+		<welcome-file>index.html</welcome-file>
+	</welcome-file-list>
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>Wildcard means whole app requires authentication</web-resource-name>
+			<url-pattern>/*</url-pattern>
+		</web-resource-collection>
+		<auth-constraint>
+			<role-name>admin</role-name>
+		</auth-constraint>
+		<user-data-constraint>
+			<transport-guarantee>NONE</transport-guarantee>
+		</user-data-constraint>
+	</security-constraint>
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>free pages</web-resource-name>
+			<url-pattern>/css/*</url-pattern>
+			<url-pattern>/js/*</url-pattern>
+			<url-pattern>/FIleUploader</url-pattern>
+		</web-resource-collection>
+	</security-constraint>
+	<login-config>
+		<auth-method>FORM</auth-method>
+		<form-login-config>
+			<form-login-page>/login.jsp</form-login-page>
+			<form-error-page>/login-failed.jsp</form-error-page>
+		</form-login-config>
+	</login-config>
+	<servlet>
+		<description></description>
+		<display-name>ImageService</display-name>
+		<servlet-name>ImageService</servlet-name>
+		<servlet-class>services.ImageService</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>ImageService</servlet-name>
+		<url-pattern>/ImageService</url-pattern>
+	</servlet-mapping>
+	<listener>
+		<listener-class>bg.filterapp.ApplicationContextListener</listener-class>
+	</listener>
+
+	<context-param>
+		<param-name>DEV_PICTURES_FOLDER</param-name>
+		<param-value>c:/temp/pictures/</param-value>
+	</context-param>
+	<context-param>
+		<param-name>DEV_CONN_STR</param-name>
+		<param-value>jdbc:mysql://localhost:3306/test</param-value>
+	</context-param>
+	<context-param>
+		<param-name>DEV_USER</param-name>
+		<param-value>root</param-value>
+	</context-param>
+	<context-param>
+		<param-name>DEV_PASS</param-name>
+		<param-value>12345678</param-value>
+	</context-param>
+	
+	<context-param>
+		<param-name>PROD_PICTURES_FOLDER</param-name>
+		<param-value>/home/vladislav/pictures/</param-value>
+	</context-param>
+	<context-param>
+		<param-name>PROD_CONN_STR</param-name>
+		<param-value>jdbc:mysql://localhost:32527/test?useInformationSchema=true</param-value>
+	</context-param>
+	<context-param>
+		<param-name>PROD_USER</param-name>
+		<param-value>root</param-value>
+	</context-param>
+	<context-param>
+		<param-name>PROD_PASS</param-name>
+		<param-value>0zmtwwu1</param-value>
+	</context-param>
+		<context-param>
+		<param-name>MODE</param-name>
+		<param-value>PROD</param-value>
+	</context-param>
+</web-app>

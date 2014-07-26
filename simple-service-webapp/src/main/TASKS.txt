@@ -1,0 +1,27 @@
+
+
+
+TODO
+===============================================================================
+
+
+2) Add new page for connecting filters
+	a) Visualize connected filters (child | parent | no).
+	b) Connect filter	
+
+3) Assign connected filter value for new object
+
+4) Assign connected filter value for an existing object
+
+5) Search by connected filter value
+
+
+
+
+-------------------------------------------------------------------------------
+2014-07-14:
+			1. Database changed (properties & propertygroups tables changed).
+			2. Attributes.view + app.js + Property Route changed to disabled deletion of attributes which has connected filters
+			3. Changed "Search" servlet mapping.
+
+			

@@ -1,0 +1,85 @@
+﻿<div class="panel panel-default">
+	<script type="text/javascript">
+		function modifyQuery() {
+			var queryString = $("#myForm").serialize();
+			var scope = angular.element($("#query")).scope();
+			scope.$apply(function() {
+				scope.query = queryString;
+			});
+			console.log("debug: queryString=" + queryString);
+		};
+	</script>
+	<div class="panel-heading" id="myTitle" name="myTitle">
+		<span ng-show="!dataLoading">Търсене</span>
+		<span ng-show="dataLoading">
+			<img src="images/loading.gif"  height="24" width="24" style="valign:top"/>
+			Зареждане...
+		</span> 
+	</div>
+	<div class="panel-body" ng-show="!dataLoading">
+		<form name="myForm" id="myForm" ng-submit="doSearch()">
+			<input type="hidden" name="query" id="query">
+			<div class="filterDiv" ng-repeat="pg in propertyGroups">
+				<label name="idTypes_{{pg.id}}">{{pg.name}}:</label>
+				<div ng-switch on="pg.type">
+					<div ng-switch-when="dropdown">
+						<input type="hidden" name={{pg.id}} id="{{pg.id}}"/> <!-- holding the real value propagated from the select -->
+						<select ng-Model="myModel" ng-options="item as item.value for item in pg.properties" ng-change='showChild(myModel, {{pg.id}})'>
+						</select>
+						<div id="childDiv{{pg.id}}" class='childDiv'></div>
+					</div>
+					<div ng-switch-when="radiobutton">
+						<div ng-repeat="prop in pg.properties">
+							<input type="radio" name="{{pg.id}}" value="{{prop.value}}">{{prop.value}}
+						</div>
+					</div>
+
+					<div ng-switch-when="simpletext">
+						<input type="text" name="{{pg.id}}" value=""
+							placeholder="Въведете брой">
+					</div>
+
+					<div ng-switch-when="checkbox">
+						<div ng-repeat="prop in pg.properties">
+							<input type="checkbox" name="{{pg.id}}" value="{{prop.value}}">{{prop.value}}
+						</div>
+					</div>
+					<div ng-switch-default>Uknown</div>
+				</div>
+			</div>
+			<button type="submit" class="btn btn-default top_margin_12" onclick="modifyQuery()">Търси</button>
+			<img src="images/loading.gif"  height="24" width="24" style="valign:top" ng-show="searching"/>
+		</form>
+	</div>
+</div>
+
+<div class="panel panel-default" ng-show="!dataLoading">
+	<div class="panel-heading">Резултати</div>
+	<div class="panel-body">
+		<!-- div>
+			<div style="font-weight: bold; vertical-align: top;" ng-repeat="location in result">
+			<img ng-src="api/v1/images?imageId={{location.id}}" width="160px" height="90px"/>
+				<div>
+				{{location.name}}
+				{{location.description}}
+				</div>
+			</div>
+		</div-->
+			<div ng-repeat="location in result">
+				<table style="width='100%'">
+					<tr><td rowspan="3"><td><img ng-src="api/v1/images?imageId={{location.id}}" width="160px" height="90px"/></td>
+					<td valign="top">{{location.name}}
+					<span><button class="deleteButton"
+								ng-click="deleteLocation($index)"
+								ng-disabled="location.processing==true" title="Изтрий">
+							</button>
+							<a ng-click="openLocationDetails($index)">Детайли</a> 
+							<img src="images/loading.gif" ng-show="location.processing"	height="24" width="24" style="valign: top" /> 
+							</span> <br>
+					{{location.description}}
+					</td></tr>
+					<tr><td></td><td align="right">{{location.created}}</td>
+				</table>
+			</div>
+	</div>
+</div>
