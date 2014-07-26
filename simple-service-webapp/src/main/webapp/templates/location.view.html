@@ -60,10 +60,11 @@
 	};
 	$(document).ready(function() {
 		$.ajax({
-			url : "api/v1/propertygroups"
+			url : "api/v1/propertygroups?excludeConnectionType=CHILD"
 		}).done(function(data) {
 			var idCounter = {val : 0};
-			$("#formBody").append(Utils.prepareContent(data, false, idCounter, fields));
+			var scope = angular.element($('#formBody')).scope();
+			$("#formBody").append(Utils.prepareContent(data, false, idCounter, fields, false, scope));
 			//drawme(data);
 		});
 	});
@@ -110,6 +111,17 @@
 		}
 		$("#formBody").append(newContent);
 	};
+	
+	function callshowHideChild(o) {
+		console.log(o);
+		var selectedId = o.selectedIndex;
+		var rawData = o[selectedId].id;
+		var metadata = new Utils.Metadata(rawData);
+		var isChild = metadata.isChild();
+		var uiControlId = metadata.parentPropertyGroupsId;
+		var scope = angular.element($("#formBody")).scope();
+		scope.showHideChild(metadata.childPropertyGroupId, isChild, uiControlId);
+	}
 </script>
 <body>
 		<div class="panel panel-default">

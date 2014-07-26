@@ -24,7 +24,7 @@
 				<div ng-switch on="pg.type">
 					<div ng-switch-when="dropdown">
 						<input type="hidden" name={{pg.id}} id="{{pg.id}}"/> <!-- holding the real value propagated from the select -->
-						<select ng-Model="myModel" ng-options="item as item.value for item in pg.properties" ng-change='showChild(myModel, {{pg.id}})'>
+						<select ng-Model="myModel" ng-options="item as item.value for item in pg.properties" ng-change='showHideChild(myModel, {{pg.id}})'>
 						</select>
 						<div id="childDiv{{pg.id}}" class='childDiv'></div>
 					</div>

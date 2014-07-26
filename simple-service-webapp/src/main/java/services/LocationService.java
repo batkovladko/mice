@@ -35,7 +35,6 @@ import bg.filterapp.services.Route;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-
 public class LocationService extends HttpServlet {
 	public static final String INPUT_FILE = "file";
 	public static final String INPUT_FORM_DATA = "formData";

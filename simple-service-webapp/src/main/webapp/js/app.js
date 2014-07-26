@@ -310,8 +310,8 @@ filterApp.controller('AttributesController', [ '$scope', '$routeParams', 'Attrib
 			};
 		} ]);
 
-filterApp.controller('AddLocationController', [ '$scope', 'PropertyGroups',
-		'Locations', function($scope, PropertyGroups, Locations) {
+filterApp.controller('AddLocationController', [ '$scope', '$http', 'PropertyGroups',
+		'Locations', function($scope, $http, PropertyGroups, Locations) {
 			$scope.propertyGroups = PropertyGroups.query();
 			$scope.s = "-1";
 			$scope.onSave = function() {
@@ -337,6 +337,10 @@ filterApp.controller('AddLocationController', [ '$scope', 'PropertyGroups',
 			$scope.getCss = function(ngModelController) {
 				var resultCss = ngModelController.$valid ? "ng-valid" : (ngModelController.$pristine ? "ng-valid":"invalidControl");
 				return resultCss;
+			};
+			$scope.showHideChild = function(childPropertyGroupId, isChild, uiControlId) {
+				
+				Utils.showHideChildBase(childPropertyGroupId, isChild, uiControlId, $scope, $http);
 			};
 		} ]);
 
@@ -387,39 +391,15 @@ filterApp.controller('SearchController', [ '$scope', '$http', '$routeParams', 'P
 			$scope.testFunction = function () {
 				alert("I'm a test function.");
 			};
-			$scope.showChild = function(k,uiControlId) {
-				var selectValue = document.getElementById(uiControlId);
-				selectValue.value = k.value;
-				
-				var childDiv = document.getElementById("childDiv" + uiControlId);
-				
-				var child = k.childPropertyGroups;
-				
-				if (child) {
-					this.searching = true;
-					$http({
-						method : 'GET',
-						data:'',
-						url : 'api/v1/propertygroups/' + child.id,
-						headers: {
-					        "Content-Type": "application/json;charset=UTF-8"
-					    }
-					}).success(function(data, status, headers, config) {
-						$scope.searching = false;
-						var idCounter = { val : 0};
-						$("#childDiv" + uiControlId).hide();
-						var content =  Utils.prepareContent([data], false, idCounter, new Array(), true);
-						childDiv.innerHTML = content;
-						$("#childDiv" + uiControlId).fadeIn(500);
-						
-					}).error(function(data, status, headers, config) {
-						$scope.searching = false;
-						alert("Грешка по време на зареждане на свързан филтър [" + child.id + "] .");
-						console.log('Error calling backend' + status);
-					});
-				} else {
-					$("#childDiv" + uiControlId).fadeOut(200, function () {childDiv.innerHTML = "";});
+			
+			$scope.showHideChild = function(k,uiControlId) {
+				var childpropertyGroupsId = null;
+				var isChild = k.childPropertyGroups != undefined;
+				if (isChild) {
+					childpropertyGroupsId = k.childPropertyGroups.id;
 				}
+				document.getElementById(uiControlId).value = k.value;
+				Utils.showHideChildBase(childpropertyGroupsId, isChild, uiControlId, $scope, $http);
 			};
 			
 			$scope.addChilds = function(propGroupId, propValue, childGroupId) {

@@ -35,7 +35,7 @@ Utils.draw = function(data, currentData, edit, fields) {
 	return newContent;
 };
 
-Utils.prepareContent = function(data, edit, idCounter, fields, skipFormat) {
+Utils.prepareContent = function(data, edit, idCounter, fields, skipFormat, scope) {
 	var result = "";
 	for (var i = 0; i < data.length; i++) {
 		var e = data[i];
@@ -51,12 +51,19 @@ Utils.prepareContent = function(data, edit, idCounter, fields, skipFormat) {
 			if (edit) {
 				c+=" disabled='disabled'";
 			}
+			c +="onchange=callshowHideChild(this)";
 			c += " >";
 			if (e.properties) {
 				c += "<option value=''/>";
 				for (var j = 0; j < e.properties.length; j++) {
 					var value = e.properties[j].value;
-					c += "<option value='" + value + "'";
+					c += "<option value='" + e.properties[j].value + "'";
+					c += " id = 'metadata: parentPropertyGroupsId=" + e.id + ";";
+					if (e.properties[j].childPropertyGroups) {
+						c += "isChildPropertyGroups=true; childPropertyGroupsId=" +
+							e.properties[j].childPropertyGroups.id + ";";
+					}
+					c +="'";//close the ID attribute
 					if (edit && e.locationPropertyValues && e.locationPropertyValues.indexOf(value) != -1) {
 						c += " selected ";
 					}
@@ -64,6 +71,8 @@ Utils.prepareContent = function(data, edit, idCounter, fields, skipFormat) {
 				}
 			}
 			c += "</select>";
+			var childDivPlaceholder="<div id='childDiv" + e.id + "' class='childDiv' style='display:none'></div>";
+			c +=childDivPlaceholder;
 			fields.push(id);
 		} else if (e.type == "radiobutton") {
 			if (e.properties) {
@@ -224,53 +233,6 @@ Utils.DumpInfo = function (event) {
     
 };
 
-Utils.createDraggableFields = function(attributes, uiControl, document) {
-	for (var i = 0; i < attributes.length; i++) {
-		var attribute =  attributes[i];
-		var content = document.createElement('div');
-		content.id=attribute.id;
-		content.draggable=true;
-		content.innerHTML=attribute.value;
-		
-//	    // Firefox from version 3.5, Google Chrome, Safari, Internet Exlorer
-//		content.addEventListener ("dragstart", DumpInfo, false);
-//            // Firefox before version 3.5
-//		content.addEventListener ("draggesture", DumpInfo, false);
-//            // Firefox, Google Chrome, Safari, Internet Exlorer
-//		content.addEventListener ("drag", DumpInfo, false);
-//            // Firefox, Google Chrome, Safari, Internet Exlorer
-//		content.addEventListener ("dragend", DumpInfo, false);
-
-            // Firefox, Google Chrome, Safari, Internet Exlorer
-		content.addEventListener ("dragenter", Utils.DumpInfo, false);
-            // Firefox, Google Chrome, Safari, Internet Exlorer
-		content.addEventListener ("dragover", Utils.DumpInfo, false);
-            // Firefox from version 3.5, Google Chrome, Safari, Internet Exlorer
-		content.addEventListener ("dragleave", Utils.DumpInfo, false);
-            // Firefox
-		content.addEventListener ("dragexit", Utils.DumpInfo, false);
-            // Firefox from version 3.5, Google Chrome, Safari, Internet Exlorer
-		content.addEventListener ("drop", Utils.DropHandler, false);
-            // Firefox before version 3.5
-		content.addEventListener ("dragdrop", Utils.DumpInfo, false);
-		
-		var childDiv = null;
-		if (attribute.childPropertyGroups) {
-			childDiv = document.createElement('div');
-			childDiv.id = attribute.childPropertyGroups.id;
-			childDiv.innerHTML = "<br>" + attribute.childPropertyGroups.name;
-			content.appendChild(childDiv);
-		} else {
-			
-		}
-		
-		uiControl.appendChild(content);
-		if (childDiv) {
-			document.getElementById(childDiv.id).draggable = true;
-		}
-	}
-};
-
 Utils.drop = function(ev) {
     ev.preventDefault();
     var source = ev.dataTransfer.getData("Text");
@@ -382,3 +344,72 @@ Utils.createAttributesAndDraggableChildFilters = function(scope, document) {
 		}
 	}
 };
+
+Utils.showHideChildBase = function(childPropertyGroupId, isChild, uiControlId, scope, http) {
+	console.log("show child called : " + childPropertyGroupId + ", " + isChild + ", " + uiControlId);
+	var childDiv = document.getElementById("childDiv" + uiControlId);
+	if (isChild) {
+		this.searching = true;
+		http({
+			method : 'GET',
+			data:'',
+			url : 'api/v1/propertygroups/' + childPropertyGroupId,
+			headers: {
+		        "Content-Type": "application/json;charset=UTF-8"
+		    }
+		}).success(function(data, status, headers, config) {
+			scope.searching = false;
+			var idCounter = { val : 0};
+			$("#childDiv" + uiControlId).hide();
+			//Todo MIGHT NEED TO ACCEPT FILEDS FROM OUTSIDE
+			var content =  Utils.prepareContent([data], false, idCounter, new Array(), true);
+			childDiv.innerHTML = content;
+			$(childDiv).fadeIn(500);
+			
+		}).error(function(data, status, headers, config) {
+			scope.searching = false;
+			alert("Грешка по време на зареждане на свързан филтър [" + childPropertyGroupId + "] .");
+			console.log('Error calling backend' + status);
+		});
+	} else {
+		$(childDiv).fadeOut(200, function () {childDiv.innerHTML = "";});
+	}
+};
+Utils.Metadata = function(rawData) {
+	this.extractValue = function(data, key) {
+		var keyLocation=data.indexOf(key); 
+		if (keyLocation == -1) {
+			return null;
+		}
+		var start = keyLocation + key.length + "=".length;
+		var end = data.indexOf(";", keyLocation);
+		return data.substring(start, end);
+	};
+	
+	this.childPropertyGroupId = null;
+	this.parentPropertyGroupsId = null;
+	this.isMetadata = false;
+	
+	if (rawData && rawData.indexOf("metadata") >=0) {
+		this.isMetadata = true;
+	}
+	
+	try {
+		if (this.isMetadata) {
+			this.childPropertyGroupId = this.extractValue(rawData, "childPropertyGroupsId");
+			this.parentPropertyGroupsId = this.extractValue(rawData, "parentPropertyGroupsId");
+		}
+	} catch (err) {
+		alert("Системен проблем. Моля свържете се с програмист и му продиктувайте това съобщение:\n" +
+				"Проблем при обработката на метаданни [" + rawData + "].\n " + err);
+	}
+	
+	this.isChild = function() {
+		var isChild = false;
+		if (this.isMetadata && this.childPropertyGroupId) {
+			isChild = true;
+		}
+		return isChild;
+	};
+};
+
