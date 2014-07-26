@@ -340,12 +340,12 @@ filterApp.controller('AddLocationController', [ '$scope', '$http', 'PropertyGrou
 			};
 			$scope.showHideChild = function(childPropertyGroupId, isChild, uiControlId) {
 				
-				Utils.showHideChildBase(childPropertyGroupId, isChild, uiControlId, $scope, $http);
+				Utils.showHideChildBase(childPropertyGroupId, isChild, uiControlId, $scope, $http, null, false, new Array());
 			};
 		} ]);
 
-filterApp.controller('UpdateLocationController', [ '$scope', '$routeParams', 'PropertyGroups', 'Locations', 
-                    function($scope, $routeParams, PropertyGroups, Locations) {
+filterApp.controller('UpdateLocationController', [ '$scope', '$http', '$routeParams', 'PropertyGroups', 'Locations', 
+                    function($scope, $http, $routeParams, PropertyGroups, Locations) {
 	$scope.newLocation = {};
 	$scope.getLocation = function (hash, callback) {
 		if (!hash || hash.indexOf("?") == -1) {
@@ -369,6 +369,10 @@ filterApp.controller('UpdateLocationController', [ '$scope', '$routeParams', 'Pr
 						console.log(httpResponse);
 					}
 				});
+	};
+	$scope.showHideChild = function(childPropertyGroupId, isChild, uiControlId, locationId, editMode, fields, disableFieldsIfinstructed) {
+		
+		Utils.showHideChildBase(childPropertyGroupId, isChild, uiControlId, $scope, $http, locationId, editMode, fields, disableFieldsIfinstructed);
 	};
 	$scope.s = "-1";
 
@@ -399,7 +403,7 @@ filterApp.controller('SearchController', [ '$scope', '$http', '$routeParams', 'P
 					childpropertyGroupsId = k.childPropertyGroups.id;
 				}
 				document.getElementById(uiControlId).value = k.value;
-				Utils.showHideChildBase(childpropertyGroupsId, isChild, uiControlId, $scope, $http);
+				Utils.showHideChildBase(childpropertyGroupsId, isChild, uiControlId, $scope, $http, null, false, new Array());
 			};
 			
 			$scope.addChilds = function(propGroupId, propValue, childGroupId) {

@@ -1,19 +1,7 @@
-<!-- iterate over result1 from point 1 and for each entry:
-  - Find matching entry in the result2 (by propertyGroupid) and generate an input.
-  	If no matches are found, then generate an error with log and stop viewing file.
-  - the generated input should have values according to the values from result1 as follows:
-  	* the name of the input should match the id of the entry from the result2;
-  	* if drop down, the selected value from the list will be the one that matches the value from result1;
-  	* if radio button, the selected option should match the value of from the result1;
-  	* if checkbox, the selected value(s) should match the value(s) from the result1;
-  	* if simpletext, the textbox value should match the value from the result1;
-  - for each result1 entry, that matches an entry in result2, the corresponding entry in result2 must be remove  
-  - once the result1 is completed, iterate over the rest of entries in the result2 and display them without any values
-  - the server sidde update will be completelly remove and reinsert of values; 
-  -->
 <!-- TODO image reload after update : the model should be updated with the new image, so img src attributes should fetch the new image-->
 <script type="text/javascript">
 	Utils.drawFields = new Array();
+	Utils.idCounter = {};
 	//this.fields = new Array();
 	function switchEditMode(button) {
 		button.disabled=true;
@@ -87,15 +75,37 @@
 	};
 	$(document).ready(function() {
 		$.ajax({
-			url : "api/v1/propertygroups"
+			url : "api/v1/propertygroups?excludeConnectionType=CHILD"
 		}).done(function(data) {
 			var callback = function() {
-				$("#formBody").append(Utils.draw(data, Utils.currentLocation, true, Utils.drawFields));
+				$("#formBody").append(Utils.draw(data, Utils.currentLocation, true, Utils.drawFields, true));
+				showAdditionalChildAttributes(Utils.drawFields);
 			}
 			var scope = angular.element($("#description")).scope();
 			var location = scope.getLocation(window.location.hash, callback);
 		});
 	});
+	function showAdditionalChildAttributes(fields) {
+		if (fields) {
+			for (var i = 0; i < fields.length; i++) {
+				if ($("#" + fields[i]).attr('onchange')) {
+					$("#" + fields[i]).change();
+				}
+			}
+		}
+	}
+	function callshowHideChild(o) {
+		console.log(o);
+		var selectedId = o.selectedIndex;
+		var rawData = o[selectedId].id;
+		var metadata = new Utils.Metadata(rawData);
+		var isChild = metadata.isChild();
+		var uiControlId = metadata.parentPropertyGroupsId;
+		var scope = angular.element($("#updateLocation")).scope();
+		var hash = window.location.hash;
+		var locationId = hash.substring(hash.indexOf("=") + 1);
+		scope.showHideChild(metadata.childPropertyGroupId, isChild, uiControlId, locationId, true, Utils.drawFields, false);
+	}
 </script>
 <body>
 	<div class="panel panel-default">

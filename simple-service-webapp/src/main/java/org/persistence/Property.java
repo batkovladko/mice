@@ -97,7 +97,7 @@ public class Property {
 	@Override
 	public String toString() {
 		return "Property [id=" + id + ", value=" + value + ", propertyGroups=" + propertyGroups
-				+ ", child Property GorupId=" + childPropertyGroups != null ? childPropertyGroups.getName()
-				: "<unkown>" + "]";
+				+ ", child Property GorupId=" + (childPropertyGroups != null ? childPropertyGroups.getName()
+				: "<unkown>") + "]";
 	}
 }

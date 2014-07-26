@@ -38,7 +38,7 @@ public class LocationsRoute extends Route {
 	public Response findById(@PathParam("locationId") final Long locationId) {
 		final EntityManager em = getEm();
 		final Location ep = em.find(Location.class, locationId);
-
+		
 		if (ep != null) {
 			Response response = Response.ok().entity(ep).build();
 			return response;

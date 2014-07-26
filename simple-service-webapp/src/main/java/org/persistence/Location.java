@@ -42,6 +42,20 @@ public class Location {
 	@OneToMany(mappedBy="location", fetch=FetchType.EAGER)
 	List<LocationProperties> locationProperties = new ArrayList<LocationProperties>();
 	
+	public Location() {
+	}
+	
+	public Location(long id, String name, String description, String imageName, Date created,
+			List<LocationProperties> locationProperties) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.description = description;
+		this.imageName = imageName;
+		this.created = created;
+		this.locationProperties = locationProperties;
+	}
+
 	public long getId() {
 		return id;
 	}
@@ -82,6 +96,15 @@ public class Location {
 		this.locationProperties = locationProperties;
 	}
 
+	public Date getCreated() {
+		return created;
+	}
+
+	public void setCreated(Date created) {
+		this.created = created;
+	}
+
+	
 //	@Override
 //	public String toString() {
 //		return "Location [id=" + id + ", name=" + name + ", description=" + description + ", imageName=" + imageName

@@ -1,6 +1,7 @@
 Utils = {};
 Utils.currentLocation={"default":"default"};
 Utils.drawFields = null;
+Utils.idCounter = {};
 
 Utils.resetFields = function(fields) {
 	//Use this
@@ -12,7 +13,8 @@ Utils.resetFields = function(fields) {
 	if (fields) {
 	}
 };
-Utils.draw = function(data, currentData, edit, fields) {
+/** @param data - all property groups, @param currentData - ?*/
+Utils.draw = function(data, currentData, edit, fields, disableFieldsIfinstructed) {
 	
 	$("#id").val(currentData.id);
 	$("#name").val(currentData.name);
@@ -25,18 +27,19 @@ Utils.draw = function(data, currentData, edit, fields) {
 		alert("Възникна проблем при редактиране на обект.\n Моля свържете се със системен програмист.");
 	}
 	var newContent = "";
-	var idCounter = { val : 0};
+	Utils.idCounter = { val : 0};
 	if (dataWithValues) {
-		newContent = Utils.prepareContent(dataWithValues, edit, idCounter, fields);
+		newContent = Utils.prepareContent(dataWithValues, edit, Utils.idCounter, fields, null, null, disableFieldsIfinstructed);
 	}
 	if (dataCopy) {
-		newContent += Utils.prepareContent(dataCopy, edit, idCounter, fields);
+		newContent += Utils.prepareContent(dataCopy, edit, Utils.idCounter, fields, null, null, disableFieldsIfinstructed);
 	}
 	return newContent;
 };
 
-Utils.prepareContent = function(data, edit, idCounter, fields, skipFormat, scope) {
+Utils.prepareContent = function(data, edit, idCounter, fields, skipFormat, scope, disableFieldsIfinstructed) {
 	var result = "";
+	
 	for (var i = 0; i < data.length; i++) {
 		var e = data[i];
 		var c = "";
@@ -48,7 +51,7 @@ Utils.prepareContent = function(data, edit, idCounter, fields, skipFormat, scope
 		if (e.type == "dropdown") {
 			var id = "id" + (idCounter.val++);
 			c += "<select name='" + e.id + "' id='" + id +"'";
-			if (edit) {
+			if (disableFieldsIfinstructed && edit) {
 				c+=" disabled='disabled'";
 			}
 			c +="onchange=callshowHideChild(this)";
@@ -71,7 +74,8 @@ Utils.prepareContent = function(data, edit, idCounter, fields, skipFormat, scope
 				}
 			}
 			c += "</select>";
-			var childDivPlaceholder="<div id='childDiv" + e.id + "' class='childDiv' style='display:none'></div>";
+			
+		var childDivPlaceholder="<div id='childDiv" + e.id + "' class='childDiv' style='display:none'></div>";
 			c +=childDivPlaceholder;
 			fields.push(id);
 		} else if (e.type == "radiobutton") {
@@ -80,7 +84,7 @@ Utils.prepareContent = function(data, edit, idCounter, fields, skipFormat, scope
 					var value = e.properties[j].value;
 					var id = "id" + (idCounter.val++);
 					c += "<input type='radio' name='" + e.id + "' id='" + id + "'";
-					if (edit) {
+					if (disableFieldsIfinstructed && edit) {
 						c+= " disabled='disabled'";
 					}
 					c+= " value='" + value + "'";
@@ -97,7 +101,7 @@ Utils.prepareContent = function(data, edit, idCounter, fields, skipFormat, scope
 					var value = e.properties[j].value;
 					var id = "id" + (idCounter.val++);
 					c += "<input type='checkbox' name='" + e.id +  "' id='" + id + "'"; 
-					if (edit) { 
+					if (disableFieldsIfinstructed && edit) { 
 						c+= " disabled='disabled'";
 					}
 					c+= " value='" + value + "'";
@@ -107,11 +111,18 @@ Utils.prepareContent = function(data, edit, idCounter, fields, skipFormat, scope
 					c += ">" + value + "&nbsp;";
 					fields.push(id);
 				}
+				var childDivPlaceholder="";
+				childDivPlaceholder="<div id='childDiv" + e.id + "' class='childDiv' style='display:none'></div>";
+				if (edit) {
+				} else {
+				}
+				
+				c +=childDivPlaceholder;
 			}
 		} else if (e.type == "simpletext") {
 			var id = "id" + (idCounter.val++);
 			c += "<input type='text' name='" + e.id + "' id='" + id + "' ";
-			if (edit) {
+			if (disableFieldsIfinstructed && edit) {
 				c+= "disabled='disabled' ";
 			}
 			c +=" value='";
@@ -345,24 +356,28 @@ Utils.createAttributesAndDraggableChildFilters = function(scope, document) {
 	}
 };
 
-Utils.showHideChildBase = function(childPropertyGroupId, isChild, uiControlId, scope, http) {
+Utils.showHideChildBase = function(childPropertyGroupId, isChild, uiControlId, scope, http, locationId, editMode, fields, disableFieldsIfinstructed) {
 	console.log("show child called : " + childPropertyGroupId + ", " + isChild + ", " + uiControlId);
 	var childDiv = document.getElementById("childDiv" + uiControlId);
+	var getPropertyGroupURL = 'api/v1/propertygroups/' + childPropertyGroupId;
+	if (locationId) {
+		getPropertyGroupURL +="?locationId=" + locationId;
+	}
 	if (isChild) {
 		this.searching = true;
 		http({
 			method : 'GET',
 			data:'',
-			url : 'api/v1/propertygroups/' + childPropertyGroupId,
+			url : getPropertyGroupURL,
 			headers: {
 		        "Content-Type": "application/json;charset=UTF-8"
 		    }
 		}).success(function(data, status, headers, config) {
 			scope.searching = false;
-			var idCounter = { val : 0};
+			
 			$("#childDiv" + uiControlId).hide();
 			//Todo MIGHT NEED TO ACCEPT FILEDS FROM OUTSIDE
-			var content =  Utils.prepareContent([data], false, idCounter, new Array(), true);
+			var content =  Utils.prepareContent([data], editMode, Utils.idCounter, fields, true, disableFieldsIfinstructed);
 			childDiv.innerHTML = content;
 			$(childDiv).fadeIn(500);
 			

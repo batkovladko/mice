@@ -8,8 +8,8 @@
 		<class>org.persistence.Admin</class>
 		<class>org.persistence.PropertyGroups</class>
 		<class>org.persistence.Location</class>
-		<class>org.persistence.LocationProperties</class>
 		<class>org.persistence.Property</class>
+		<class>org.persistence.LocationProperties</class>
 		<properties>
 			<property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver" />
 			<!-- property name="javax.persistence.jdbc.url" value="jdbc:mysql://50.31.138.79:3306/micehost_mice?useInformationSchema=true"/-->

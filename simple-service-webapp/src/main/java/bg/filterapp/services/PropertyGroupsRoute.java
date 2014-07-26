@@ -2,6 +2,7 @@ package bg.filterapp.services;
 
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -17,7 +18,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang3.StringUtils;
-import org.glassfish.jersey.client.HttpUrlConnectorProvider;
+import org.persistence.Location;
 import org.persistence.LocationProperties;
 import org.persistence.Property;
 import org.persistence.PropertyGroups;
@@ -55,7 +56,7 @@ public class PropertyGroupsRoute extends Route {
 
 		List<SinglePropertyGroupDTO> pg = new ArrayList<SinglePropertyGroupDTO>();
 		for (PropertyGroups singleGroup : propertyGroups) {
-			pg.add(new SinglePropertyGroupDTO(singleGroup, Property.byPropertyGroup(singleGroup, em)));
+			pg.add(new SinglePropertyGroupDTO(singleGroup, Property.byPropertyGroup(singleGroup, em), null));
 		}
 		return pg;
 	}
@@ -63,12 +64,29 @@ public class PropertyGroupsRoute extends Route {
 	@GET
 	@Produces("application/json")
 	@Path("{id}")
-	public SinglePropertyGroupDTO getIt(@PathParam("id") Long id) {
+	/**
+	 * Fetches certain property group(filter). Optionally (if specified) returns it's properties(attributes) for certain location.
+	 * @param id
+	 * @param locationId
+	 * @return
+	 */
+	public Response getIt(@PathParam("id") Long id, @QueryParam(value="locationId") Long locationId) {
 		final EntityManager em = getEm();
 		PropertyGroups pGroup = em.find(PropertyGroups.class, id);
+		List<LocationProperties> locationPropertyValues = Collections.emptyList();
+		
 		if (pGroup != null) {
 			System.out.println("Found " + pGroup);
-			return new SinglePropertyGroupDTO(pGroup, Property.byPropertyGroup(pGroup, em));
+			if (locationId != null) {
+				Location location = em.find(Location.class, locationId.longValue());
+				if (location == null) {
+					return ResponseUtils.buildResponseWithHeader(HttpURLConnection.HTTP_BAD_REQUEST,
+								"Invalid location id : "+ locationId);
+				}
+				locationPropertyValues = LocationProperties.byLocationAndGroup(location, pGroup, em);
+				
+			}
+			return Response.ok(new SinglePropertyGroupDTO(pGroup, Property.byPropertyGroup(pGroup, em), locationPropertyValues)).build();
 		} else {
 			System.out.println("Nothing is found with id " + id);
 			return null;

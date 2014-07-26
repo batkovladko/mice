@@ -20,6 +20,7 @@ import org.apache.logging.log4j.Logger;
 import bg.filterapp.services.LocationJSON;
 import bg.filterapp.services.ResponseUtils;
 
+@WebServlet("/api/v1/updatelocation")
 public class UpdateLocationService extends LocationService {
 	private static final long serialVersionUID = -8492948004736493003L;
 	private static Logger logger = LogManager.getLogger(UpdateLocationService.class);

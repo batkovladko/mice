@@ -34,7 +34,9 @@ import bg.filterapp.services.JsonIgnoreOnSerialization;
 @NamedQueries({
 		@NamedQuery(name = "LocationProperties.findPropertiesByParent", query = "SELECT b FROM LocationProperties b WHERE b.location = :locationid", hints = { @QueryHint(name = QueryHints.REFRESH, value = HintValues.TRUE) }),
 		@NamedQuery(name = "LocationProperties.findByPropertyGroup", query = "SELECT b FROM LocationProperties b WHERE b.group= :pGroup", hints = { @QueryHint(name = QueryHints.REFRESH, value = HintValues.TRUE) }),
-		@NamedQuery(name = "LocationProperties.findByLocation", query = "SELECT b FROM LocationProperties b WHERE b.location= :pLocation", hints = { @QueryHint(name = QueryHints.REFRESH, value = HintValues.TRUE) }) })
+		@NamedQuery(name = "LocationProperties.findByLocation", query = "SELECT b FROM LocationProperties b WHERE b.location= :pLocation", hints = { @QueryHint(name = QueryHints.REFRESH, value = HintValues.TRUE) }),
+		@NamedQuery(name = "LocationProperties.findByLocationandGroup", query = "SELECT b FROM LocationProperties b WHERE b.location= :pLocation and b.group= :pGroup", hints = { @QueryHint(name = QueryHints.REFRESH, value = HintValues.TRUE)})
+})
 @TableGenerator(name = "locationPropertiesGenerator", table = "sequence", pkColumnName = "seq_name", pkColumnValue = "location_p_id", valueColumnName = "seq_count", allocationSize = 1)
 public class LocationProperties {
 
@@ -94,5 +96,9 @@ public class LocationProperties {
 	public static List<LocationProperties> byLocation(Location location, EntityManager em) {
 		return em.createNamedQuery("LocationProperties.findByLocation", LocationProperties.class)
 				.setParameter("pLocation", location).getResultList();
+	}
+	public static List<LocationProperties> byLocationAndGroup(Location location, PropertyGroups pGroup, EntityManager em) {
+		return em.createNamedQuery("LocationProperties.findByLocationandGroup", LocationProperties.class)
+				.setParameter("pLocation", location).setParameter("pGroup", pGroup).getResultList();
 	}
 }

@@ -1,9 +1,11 @@
 package bg.filterapp.services;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.persistence.LocationProperties;
 import org.persistence.Property;
 import org.persistence.PropertyGroups;
 
@@ -18,18 +20,31 @@ public class SinglePropertyGroupDTO {
 	private String value;
 
 	private List<Property> properties;
+	
+	private List<String> locationPropertyValues;
 
 	public SinglePropertyGroupDTO() {
 	}
 
 	public SinglePropertyGroupDTO(final PropertyGroups propertyGroup,
-			final List<Property> list) {
+			final List<Property> list, List<LocationProperties> locationPropertyList) {
+		this(locationPropertyList);
 		this.id = propertyGroup.getId();
 		this.name = propertyGroup.getName();
 		this.type = propertyGroup.getType();
 		this.properties = list;
 	}
 
+	public SinglePropertyGroupDTO(List<LocationProperties> locationProperties) {
+		List<String> result = new ArrayList<String>();
+		if (locationProperties == null) {
+			return;
+		}
+		for (LocationProperties lp : locationProperties) {
+			result.add(lp.getValue());
+		}
+		this.locationPropertyValues = result;
+	}
 	public void setValue(String value) {
 		this.value = value;
 	}
@@ -70,4 +85,11 @@ public class SinglePropertyGroupDTO {
 		this.type = type;
 	}
 
+	public List<String> getLocationPropertyValues() {
+		return locationPropertyValues;
+	}
+
+	public void setLocationPropertyValues(List<String> locationPropertyValues) {
+		this.locationPropertyValues = locationPropertyValues;
+	}
 }
