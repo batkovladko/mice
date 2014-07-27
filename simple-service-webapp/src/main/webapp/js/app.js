@@ -314,7 +314,9 @@ filterApp.controller('AddLocationController', [ '$scope', '$http', 'PropertyGrou
 		'Locations', function($scope, $http, PropertyGroups, Locations) {
 			$scope.propertyGroups = PropertyGroups.query();
 			$scope.s = "-1";
+			$scope.errorMessage = null;
 			$scope.onSave = function() {
+				$scope.errorMessage = null;
 				var data = {
 					name : $scope.name,
 					properties : []

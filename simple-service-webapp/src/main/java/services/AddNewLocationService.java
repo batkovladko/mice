@@ -54,8 +54,10 @@ public class AddNewLocationService extends LocationService {
 
 			List<FileItem> items = validateInput(request, response, true);
 			if (items == null) {
+				response.getWriter().println("Metadata: errorCode=" + response.getStatus() + ";");
 				return;
 			}
+			
 			FileItem fileItem = getItemWithName(INPUT_FILE, items);
 			FileItem dataItem = getItemWithName(INPUT_FORM_DATA, items);
 			LocationJSON location = gson.fromJson(URLDecoder.decode(dataItem.getString(), "UTF-8"),

@@ -48,9 +48,17 @@
 			if (iFrame.innerHTML && iFrame.innerHTML.indexOf("success") != -1) {
 				loading.style.display = "none";
 				Utils.resetFields(this.fields);
+				document.getElementById("errorMessage").innerHTML = "";
 			} else {
 				loading.style.display = "none";
-				alert("Проблем при създаването на нов обект." );
+				var errorCode = Utils.getErrorCode(iFrame.innerHTML);
+				var scope = angular.element($('#formBody')).scope();
+				if (451 == errorCode) {
+					document.getElementById("errorMessage").innerHTML = "Снимката надвишава максималния разрешен размер от 2MB.";
+				} else {
+					console.log("Error during new location creation: " + errorCode);
+					alert("Проблем при създаването на нов обект.");
+				}
 			}
 		}
 	};
@@ -145,6 +153,7 @@
 			</div>
 
 			<div class="panel-body" id="formBody"></div>
+			<span id="errorMessage" class="errorMessage"></span>
 			<div>
 				<button type="button" class="btn btn-default" id="submitButton"
 					onclick="redirect()" ng-disabled="locationsLoading==true || newLocation.$pristine || (newLocation.$dirty && newLocation.$invalid)">Запази</button>

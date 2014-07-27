@@ -390,16 +390,18 @@ Utils.showHideChildBase = function(childPropertyGroupId, isChild, uiControlId, s
 		$(childDiv).fadeOut(200, function () {childDiv.innerHTML = "";});
 	}
 };
+
+Utils.extractValue = function(data, key) {
+	var keyLocation=data.indexOf(key); 
+	if (keyLocation == -1) {
+		return null;
+	}
+	var start = keyLocation + key.length + "=".length;
+	var end = data.indexOf(";", keyLocation);
+	return data.substring(start, end);
+};
+
 Utils.Metadata = function(rawData) {
-	this.extractValue = function(data, key) {
-		var keyLocation=data.indexOf(key); 
-		if (keyLocation == -1) {
-			return null;
-		}
-		var start = keyLocation + key.length + "=".length;
-		var end = data.indexOf(";", keyLocation);
-		return data.substring(start, end);
-	};
 	
 	this.childPropertyGroupId = null;
 	this.parentPropertyGroupsId = null;
@@ -411,8 +413,8 @@ Utils.Metadata = function(rawData) {
 	
 	try {
 		if (this.isMetadata) {
-			this.childPropertyGroupId = this.extractValue(rawData, "childPropertyGroupsId");
-			this.parentPropertyGroupsId = this.extractValue(rawData, "parentPropertyGroupsId");
+			this.childPropertyGroupId = Utils.extractValue(rawData, "childPropertyGroupsId");
+			this.parentPropertyGroupsId = Utils.extractValue(rawData, "parentPropertyGroupsId");
 		}
 	} catch (err) {
 		alert("Системен проблем. Моля свържете се с програмист и му продиктувайте това съобщение:\n" +
@@ -427,4 +429,7 @@ Utils.Metadata = function(rawData) {
 		return isChild;
 	};
 };
-
+Utils.getErrorCode = function (response) {
+	var errorCode = Utils.extractValue(response, "errorCode");
+	return errorCode;
+};

@@ -30,6 +30,7 @@ import org.persistence.PropertyGroups;
 
 import bg.filterapp.services.LocationAddPropertiesJSON;
 import bg.filterapp.services.LocationJSON;
+import bg.filterapp.services.ResponseUtils;
 import bg.filterapp.services.Route;
 
 import com.google.gson.Gson;
@@ -69,7 +70,8 @@ public class LocationService extends HttpServlet {
 				return null;
 			}
 			if (fileItem != null && fileItem.getSize() > MAX_FILE_SIZE) {
-				buildServerError(response, "Too big image file : " + fileItem.getSize());
+				String errorMessage = String.format("Too bih image file. Max allowed [%d], actuall [%s]", MAX_FILE_SIZE, fileItem.getSize());
+				buildCustomError(451, errorMessage, response);
 				return null;
 			} else {
 				FileItem formData = getItemWithName(INPUT_FORM_DATA, items);
@@ -195,6 +197,13 @@ public class LocationService extends HttpServlet {
 
 	public static void buildServerError(HttpServletResponse response, String error) throws IOException {
 		buildServerError(response, error, true);
+	}
+	
+	public static void buildCustomError(int statusCode, String error, HttpServletResponse response) {
+		response.setStatus(statusCode);
+		if (error != null) {
+			response.addHeader(ResponseUtils.ERROR_MESSAGE_HEADER, error);
+		}
 	}
 
 	public static void buildServerError(HttpServletResponse response, String error, boolean printInTheResponse)
