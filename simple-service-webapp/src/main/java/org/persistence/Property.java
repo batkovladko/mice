@@ -24,12 +24,15 @@ import org.eclipse.persistence.config.QueryHints;
 @Entity
 @Table(name = "properties")
 
-@NamedQueries({ @NamedQuery(name = "Properties.findAllPropertiesById", 
+@NamedQueries({ @NamedQuery(name = "Properties.findPropertiesByPropertyGroups", 
 							query = "SELECT b FROM Property b WHERE b.propertyGroups = :propertygroup",
 							hints = { @QueryHint(name = QueryHints.REFRESH, value = HintValues.TRUE) }),
 				@NamedQuery(name = "Properties.findPropertyByConnectedFilter", 
 							query = "SELECT b FROM Property b WHERE b.childPropertyGroups = :childPropertyGroups",
-							hints = { @QueryHint(name = QueryHints.REFRESH, value = HintValues.TRUE) })		
+							hints = { @QueryHint(name = QueryHints.REFRESH, value = HintValues.TRUE) }),
+				@NamedQuery(name = "Properties.findPropertiesByPropertyGroupAndNonEmptyChildPropertyGroups", 
+							query = "SELECT b FROM Property b WHERE b.propertyGroups= :propertyGroups and b.childPropertyGroups != null",
+							hints = { @QueryHint(name = QueryHints.REFRESH, value = HintValues.TRUE) })
 })
 @TableGenerator(name = "propertiesGenerator", table = "sequence", pkColumnName = "seq_name", pkColumnValue = "properties_id", valueColumnName = "seq_count", allocationSize = 1)
 public class Property {
@@ -82,11 +85,17 @@ public class Property {
 	}
 
 	public static List<Property> byPropertyGroup(PropertyGroups pGroup, EntityManager em) {
-		return em.createNamedQuery("Properties.findAllPropertiesById", Property.class)
+		return em.createNamedQuery("Properties.findPropertiesByPropertyGroups", Property.class)
 				.setParameter("propertygroup", pGroup).getResultList();
 	}
 	
-	public static Property byConnectedFilter(PropertyGroups pGroup, EntityManager em) {
+	public static List<Property> byPropertyGroupAndNonEmptyChildPropertyGroups(PropertyGroups pGroup, EntityManager em) {
+		return em.createNamedQuery("Properties.findPropertiesByPropertyGroupAndNonEmptyChildPropertyGroups", Property.class)
+				.setParameter("propertyGroups", pGroup).getResultList();
+	}
+	
+	
+	public static Property byChildPropertyGroup(PropertyGroups pGroup, EntityManager em) {
 		try { 
 			return em.createNamedQuery("Properties.findPropertyByConnectedFilter", Property.class).setParameter("childPropertyGroups", pGroup).getSingleResult();
 		} catch (NoResultException nre) {

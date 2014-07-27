@@ -113,7 +113,7 @@ public class PropertyRoute extends Route {
 				return ResponseUtils.buildResponseWithHeader(HttpURLConnection.HTTP_BAD_REQUEST,
 						String.format("Property group with id [%s] does not exist.", pGroupId));
 			}
-			TypedQuery<Property> query = em.createNamedQuery("Properties.findAllPropertiesById", Property.class)
+			TypedQuery<Property> query = em.createNamedQuery("Properties.findPropertiesByPropertyGroups", Property.class)
 					.setParameter("propertygroup", pGroup);
 			List<Property> properties = query.getResultList();
 			return Response.ok(properties).build();

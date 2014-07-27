@@ -210,30 +210,38 @@ public class PropertyGroupsRoute extends Route {
 			em.getTransaction().begin();
 
 			PropertyGroups childPGroup = em.find(PropertyGroups.class, id);
-			if (childPGroup == null || !ConnectionType.CHILD.equals(childPGroup.getConnectedToOtherAs())) {
+			if (childPGroup == null) {
 				String errorMessage = String
-						.format("A  property(value) cannot be disconnected to Property Group [%s] because such group does not exist or"
-								+ " it is not a child group at all!",
+						.format("The connection between an attribute(property) and child property group [%s] cannot be removed, because such child property group does not exist or",
 								id);
 				System.out.println(errorMessage);
 				return ResponseUtils.buildResponseWithHeader(HttpURLConnection.HTTP_BAD_REQUEST, errorMessage);
 			}
-
-			property = Property.byConnectedFilter(childPGroup, em);
+			if (!ConnectionType.CHILD.equals(childPGroup.getConnectedToOtherAs())) {
+				String errorMessage = String
+						.format("The connection between an attribute(property) and child property group [%s] cannot be removed, because such child property group does not exist or"
+								+ " it is not a child group at all!",
+								childPGroup);
+				System.out.println(errorMessage);
+				return ResponseUtils.buildResponseWithHeader(HttpURLConnection.HTTP_BAD_REQUEST, errorMessage);
+			}
+				
+			//Since a childProperty group can be connected to only one property, just look for this property via it's child group
+			property = Property.byChildPropertyGroup(childPGroup, em);
 
 			if (property == null) {
 				String errorMessage = String
-						.format("[inconsistency]: Cannot delete connection of the filter(property group) [%s] "
-								+ "with its property , because the filter is not connected to any property, although it is considered as a PARENT. ",
+						.format("[inconsistency]: Cannot delete connection of the childPropertyGroup(filter) [%s] "
+								+ "with its property(attribute) , because the childPropertyGroup is not connected to any property. ",
 								id);
 				return ResponseUtils.buildResponseWithHeader(HttpURLConnection.HTTP_BAD_REQUEST, errorMessage);
 			}
 			
 			if (!property.getPropertyGroups().getConnectedToOtherAs().equals(ConnectionType.PARENT)) {
 				String errorMessage = String
-						.format("[inconsistency]: Cannot delete connection of the filter(property group) [%s] "
-								+ "with its property , because the filter's type is not PARENT ",
-								property.getPropertyGroups().getId());
+						.format("[inconsistency]: Cannot delete connection of the childPropertyGroup(filter) [%s] "
+								+ "with its property(attribute) [%s], because the property(attribute) does not belong to PARENT type of property group.",
+								property.getPropertyGroups().getId(), property);
 				return ResponseUtils.buildResponseWithHeader(HttpURLConnection.HTTP_BAD_REQUEST, errorMessage);
 			}
 
@@ -243,7 +251,12 @@ public class PropertyGroupsRoute extends Route {
 
 			childPGroup.setConnectedToOtherAs(ConnectionType.NOT_CONNECTED);
 			property.setChildPropertyGroups(null);
-			property.getPropertyGroups().setConnectedToOtherAs(ConnectionType.NOT_CONNECTED);
+			
+			List<Property> otherConnectedProperies = Property.byPropertyGroupAndNonEmptyChildPropertyGroups(property.getPropertyGroups(), em);
+			//only if this is the last connection for any attribute of this property group
+			if (otherConnectedProperies.isEmpty()) {
+				property.getPropertyGroups().setConnectedToOtherAs(ConnectionType.NOT_CONNECTED);
+			}
 			em.getTransaction().commit();
 			return Response.ok(property).build();
 		} catch (Exception e) {
