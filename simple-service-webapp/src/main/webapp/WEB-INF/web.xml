@@ -108,7 +108,7 @@
 	</context-param>
 	<context-param>
 		<param-name>MODE</param-name>
-		<param-value>DEV</param-value>
+		<param-value>PROD</param-value>
 	</context-param>
 
 	<servlet>

@@ -249,7 +249,7 @@ Utils.drop = function(ev) {
     var source = ev.dataTransfer.getData("Text");
     var target = ev.target.id;
     var result = [source,target];
-    console.log("Drag & drop :" + result);
+   // console.log("Drag & drop :" + result);
     
     return result;
 };
@@ -258,7 +258,7 @@ Utils.dropGetSource = function(ev) {
     ev.preventDefault();
     var source = ev.dataTransfer.getData("Text");
     var result = source;
-    console.log("Drag & drop source:" + result);
+    //console.log("Drag & drop source:" + result);
     return result;
 };
 
@@ -272,6 +272,23 @@ Utils.dropGetTarget = function(ev) {
 
 Utils.allowDrop = function(ev) {
     ev.preventDefault();
+    var id = ev.target.id;
+    var box = $(document.getElementById(id));
+    var hasChildsOtherThanValue = document.getElementById(id) && document.getElementById(id).childNodes && document.getElementById(id).childNodes.length >1;
+    var isFilterAttribute =  document.getElementById(id) && document.getElementById(id).parentNode && "filterAttributes" == document.getElementById(id).parentNode.id;
+    if (box && id.indexOf("free") < 0 && isFilterAttribute && !hasChildsOtherThanValue) {
+    		box.addClass("attributeHover");
+    } 
+};
+Utils.dragLeave = function(ev) {
+    ev.preventDefault();
+    var box = $(document.getElementById(ev.target.id));
+    if (box && ev.target.id.indexOf("free") < 0) {
+    	box.removeClass("attributeHover");
+    	box.removeClass("attributeHoverNotAllowed");
+    	box.addClass("attributeValue");
+    	console.log('set attributeValue class to ' + ev.target.id);
+    }
 };
 
 Utils.drag = function(ev) {
@@ -326,6 +343,7 @@ Utils.createAttributesAndDraggableChildFilters = function(scope, document) {
 		content.id=attribute.id;
 		content.ondrop=function(event, attributes) { Utils.dropAndConnectFilters(event, scope);};
 		content.ondragover=Utils.allowDrop;
+		content.ondragleave=Utils.dragLeave;
 		content.innerHTML=attribute.value;
 		content.className="attributeValue";
 		content.draggable = false;

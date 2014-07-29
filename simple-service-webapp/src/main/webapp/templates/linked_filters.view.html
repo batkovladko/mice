@@ -3,7 +3,6 @@
 	<script>
 		function handleMouseOverDetails(object) {
 			var id = object.id;
-			console.log("mouseover id=" +  id);
 			var realId = "tooltipfreeFilter_" + id.substring(id.indexOf("_") + 1, id.length);
 			var parent = document.getElementById(id);
 			var details = document.getElementById(realId);
@@ -38,7 +37,7 @@
 			Edit/New
 			 -->
 			<select ng-model="selectedFilter"
-				ng-options="property.name for property in propertyGroups"
+				ng-options="property.name for property in propertyGroupsLinkedFilters"
 				ng-change='loadParentFilterAttributes("filterAttributes");'
 				id="selectedFilter"
 				>

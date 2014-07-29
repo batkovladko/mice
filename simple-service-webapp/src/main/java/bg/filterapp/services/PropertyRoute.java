@@ -212,6 +212,11 @@ public class PropertyRoute extends Route {
 				return ResponseUtils.buildResponseWithHeader(HttpURLConnection.HTTP_BAD_REQUEST,
 						errorMessage);
 			}
+			if (property.getChildPropertyGroups() != null) {
+				String errorMessage = String.format("The property [%s] already have a child filter [%s]. ", property, property.getChildPropertyGroups());
+				System.out.println(errorMessage);
+				return ResponseUtils.buildResponseWithHeader(HttpURLConnection.HTTP_BAD_REQUEST, errorMessage, "occupied");
+			}
 			
 			property.setChildPropertyGroups(childPGroup);
 			property.getPropertyGroups().setConnectedToOtherAs(ConnectionType.PARENT);

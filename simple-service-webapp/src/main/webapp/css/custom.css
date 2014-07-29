@@ -160,6 +160,15 @@
 	margin: 0px 10px 10px 10px;
 	padding: 5px;
 }
+.attributeHover {
+    background:#eee;
+    border: 2px dashed #000;
+}
+.attributeHoverNotAllowed {
+    background:red;
+    border: 2px dashed #000;
+    
+}
 .tooltipInput {
 	margin-left: 20px;
 }

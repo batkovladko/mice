@@ -31,7 +31,8 @@ public class PropertyGroupsRoute extends Route {
 	@Produces("application/json")
 	public List<SinglePropertyGroupDTO> getIt(
 			@QueryParam(value = "excludeConnectionType") PropertyGroups.ConnectionType excludeConnectionType,
-			@QueryParam(value = "includeConnectionType") PropertyGroups.ConnectionType inclConnectionType
+			@QueryParam(value = "includeConnectionType") PropertyGroups.ConnectionType inclConnectionType,
+			@QueryParam(value = "type") String type
 			) {
 
 		if (excludeConnectionType != null && inclConnectionType != null) {
@@ -56,6 +57,9 @@ public class PropertyGroupsRoute extends Route {
 
 		List<SinglePropertyGroupDTO> pg = new ArrayList<SinglePropertyGroupDTO>();
 		for (PropertyGroups singleGroup : propertyGroups) {
+			if (type != null && !singleGroup.getType().toLowerCase().equals(type.toLowerCase())) {
+				continue;
+			}
 			pg.add(new SinglePropertyGroupDTO(singleGroup, Property.byPropertyGroup(singleGroup, em), null));
 		}
 		return pg;
