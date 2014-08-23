@@ -1,14 +1,14 @@
 package bg.mice.data.dto;
 
 
-public class LocationAddPropertiesJSON {
+public class LocationAddPropertiesDTO {
 	private String name;
 	private String value;
 
-	public LocationAddPropertiesJSON() {
+	public LocationAddPropertiesDTO() {
 	}
 
-	public LocationAddPropertiesJSON(String name, String value) {
+	public LocationAddPropertiesDTO(String name, String value) {
 		this.name = name;
 		this.value = value;
 	}

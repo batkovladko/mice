@@ -4,14 +4,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URLDecoder;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map.Entry;
 
 import javax.persistence.EntityManager;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -22,16 +17,13 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import bg.mice.data.dto.Elements;
-import bg.mice.data.dto.LocationJSON;
+import bg.mice.data.dto.LocationAddDTO;
 import bg.mice.data.model.Location;
 import bg.mice.data.model.LocationProperties;
 import bg.mice.helpers.ResponseUtils;
@@ -62,30 +54,9 @@ public class LocationsRoute extends LocationService {
 
 	@GET
 	@Produces("application/json")
-	public List<Elements> getIt(@Context UriInfo uri) {
-
+	public List<Location> getIt() {
 		final EntityManager em = getEm();
-		List<Elements> elements = new ArrayList<Elements>();
-		MultivaluedMap<String, String> queryParams = uri.getQueryParameters();
-		if (!queryParams.isEmpty()) {
-			CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
-			CriteriaQuery<Object> query = criteriaBuilder.createQuery();
-			Root<LocationProperties> rootElement = query.from(LocationProperties.class);
-			for (Entry<String, List<String>> queryParam : queryParams.entrySet()) {
-				String value = queryParam.getValue().get(0);
-				query.where(criteriaBuilder.equal(rootElement.get(queryParam.getKey()), value));
-			}
-			return null;
-		} else {
-			List<Location> locationPath = em.createNamedQuery("Location.findAllLocations", Location.class)
-					.getResultList();
-			for (Location location : locationPath) {
-				elements.add(new Elements(location, em
-						.createNamedQuery("LocationProperties.findPropertiesByParent", LocationProperties.class)
-						.setParameter("locationid", location).getResultList()));
-			}
-			return elements;
-		}
+		return Location.getAll(em);
 	}
 
 	/**
@@ -98,9 +69,9 @@ public class LocationsRoute extends LocationService {
 
 		try {
 			// Check that we have a file upload request
-		
+
 			LocationValidationResponse validationResult = validateInput(servletRequest, true);
-			
+
 			if (validationResult.getItems() == null) {
 				return ResponseUtils.buildRestResponseWithBody(HttpURLConnection.HTTP_OK, "Metadata: errorCode="
 						+ (validationResult.getError() != null ? validationResult.getError().getStatus() : "-1") + ";");
@@ -108,7 +79,7 @@ public class LocationsRoute extends LocationService {
 
 			FileItem fileItem = getItemWithName(INPUT_FILE, validationResult.getItems());
 			FileItem dataItem = getItemWithName(INPUT_FORM_DATA, validationResult.getItems());
-			LocationJSON location = gson.fromJson(URLDecoder.decode(dataItem.getString(), "UTF-8"), LocationJSON.class);
+			LocationAddDTO location = gson.fromJson(URLDecoder.decode(dataItem.getString(), "UTF-8"), LocationAddDTO.class);
 
 			location.setImageName(fileItem.getName());
 			imageFile = fileItem.getInputStream();
@@ -124,8 +95,6 @@ public class LocationsRoute extends LocationService {
 			}
 		}
 	}
-
-	
 
 	@DELETE
 	@Path("{id}")

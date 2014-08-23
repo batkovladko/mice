@@ -2,26 +2,26 @@ package bg.mice.data.dto;
 
 import java.util.List;
 
-public class LocationJSON {
+public class LocationAddDTO {
 
 	private long id;
 	private String name;
 	private String description;
 	private String imageName;
 
-	private List<LocationAddPropertiesJSON> properties;
+	private List<LocationAddPropertiesDTO> properties;
 
-	public LocationJSON() {
+	public LocationAddDTO() {
 
 	}
 
-	public LocationJSON(final String name, final List<LocationAddPropertiesJSON> properties) {
+	public LocationAddDTO(final String name, final List<LocationAddPropertiesDTO> properties) {
 		this.name = name;
 		this.properties = properties;
 	}
 	
 	
-	public LocationJSON(String name, String description, List<LocationAddPropertiesJSON> properties) {
+	public LocationAddDTO(String name, String description, List<LocationAddPropertiesDTO> properties) {
 		super();
 		this.name = name;
 		this.description = description;
@@ -29,8 +29,8 @@ public class LocationJSON {
 	}
 	
 
-	public LocationJSON(long id, String name, String description, String imageName,
-			List<LocationAddPropertiesJSON> properties) {
+	public LocationAddDTO(long id, String name, String description, String imageName,
+			List<LocationAddPropertiesDTO> properties) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -47,11 +47,11 @@ public class LocationJSON {
 		this.name = name;
 	}
 
-	public List<LocationAddPropertiesJSON> getProperties() {
+	public List<LocationAddPropertiesDTO> getProperties() {
 		return properties;
 	}
 
-	public void setProperties(List<LocationAddPropertiesJSON> properties) {
+	public void setProperties(List<LocationAddPropertiesDTO> properties) {
 		this.properties = properties;
 	}
 	

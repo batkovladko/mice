@@ -177,3 +177,13 @@
 .tooltipFilterTitle {
 	margin-bottom: 20px;
 }
+
+.searchResultName {
+	font-weight: bold;
+}
+
+.searchResultDescription {
+}
+.searchResultCreated {
+	color: gray;
+}

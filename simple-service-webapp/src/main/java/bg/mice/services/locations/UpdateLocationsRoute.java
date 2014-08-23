@@ -17,7 +17,7 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import bg.mice.data.dto.LocationJSON;
+import bg.mice.data.dto.LocationAddDTO;
 import bg.mice.helpers.ResponseUtils;
 import bg.mice.services.LocationService;
 
@@ -56,7 +56,7 @@ public class UpdateLocationsRoute extends LocationService {
 			}
 
 			String decodedFormData = URLDecoder.decode(getItemWithName(INPUT_FORM_DATA, validationResult.getItems()).getString(), "UTF-8");
-			LocationJSON location = gson.fromJson(decodedFormData, LocationJSON.class);
+			LocationAddDTO location = gson.fromJson(decodedFormData, LocationAddDTO.class);
 
 			FileItem fileItem = getItemWithName(INPUT_FILE, validationResult.getItems());
 

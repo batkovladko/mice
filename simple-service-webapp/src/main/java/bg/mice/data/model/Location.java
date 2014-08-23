@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Entity;
+import javax.persistence.EntityManager;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -45,12 +46,13 @@ public class Location {
 	public Location() {
 	}
 	
+	public Location(long id, String name, String description) {
+	}
+	
+	
 	public Location(long id, String name, String description, String imageName, Date created,
 			List<LocationProperties> locationProperties) {
-		super();
-		this.id = id;
-		this.name = name;
-		this.description = description;
+		this(id, name, description);
 		this.imageName = imageName;
 		this.created = created;
 		this.locationProperties = locationProperties;
@@ -104,11 +106,22 @@ public class Location {
 		this.created = created;
 	}
 
+	public static List<Location> getAll(EntityManager em) {
+		return em.createNamedQuery("Location.findAllLocations", Location.class).getResultList();
+	}
 	
-//	@Override
-//	public String toString() {
-//		return "Location [id=" + id + ", name=" + name + ", description=" + description + ", imageName=" + imageName
-//				+ ", created=" + created + ", locationProperties=" + locationProperties + "]";
-//	}
+	public static List<Location> getResult(String queryId, EntityManager em) {
+		String SQL_GET_RESULTS2 = "select distinct location.* from location left join (select l.* from memory_table mt left join all_data l on l.l_id=mt.location_id"
+				+ "	where mt.query_n=? order by l.l_id, l.pg_name) result on location.id=result.l_id";
+		List<Location> r = em.createNativeQuery(SQL_GET_RESULTS2, Location.class).setParameter(1, queryId).getResultList();
+		return r;
+		
+	}
+	
+	@Override
+	public String toString() {
+		return "Location [id=" + id + ", name=" + name + ", description=" + description + ", imageName=" + imageName
+				+ ", created=" + created + ", locationProperties=" + locationProperties + "]";
+	}
 	
 }

@@ -25,8 +25,8 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import bg.mice.config.App;
-import bg.mice.data.dto.LocationAddPropertiesJSON;
-import bg.mice.data.dto.LocationJSON;
+import bg.mice.data.dto.LocationAddPropertiesDTO;
+import bg.mice.data.dto.LocationAddDTO;
 import bg.mice.data.model.Location;
 import bg.mice.data.model.LocationProperties;
 import bg.mice.data.model.PropertyGroups;
@@ -78,7 +78,7 @@ public class LocationService extends Route {
 		return new LocationValidationResponse(null, null);
 	}
 
-	protected void persistNewLocation(LocationJSON inputLocation, InputStream image) throws IOException {
+	protected void persistNewLocation(LocationAddDTO inputLocation, InputStream image) throws IOException {
 		final EntityManager em = Route.getEm();
 		em.getTransaction().begin();
 
@@ -104,7 +104,7 @@ public class LocationService extends Route {
 		}
 	}
 
-	protected void updateLocation(LocationJSON newLocation, InputStream image) throws FileNotFoundException,
+	protected void updateLocation(LocationAddDTO newLocation, InputStream image) throws FileNotFoundException,
 			IOException {
 		final EntityManager em = Route.getEm();
 		em.getTransaction().begin();
@@ -148,13 +148,13 @@ public class LocationService extends Route {
 
 	}
 
-	private void addLocationProperties(List<LocationAddPropertiesJSON> inputProperties, final Location newLocation,
+	private void addLocationProperties(List<LocationAddPropertiesDTO> inputProperties, final Location newLocation,
 			final EntityManager em) {
 		if (inputProperties == null) {
 			return;
 		}
 
-		for (LocationAddPropertiesJSON property : inputProperties) {
+		for (LocationAddPropertiesDTO property : inputProperties) {
 			if (StringUtils.isEmpty(property.getValue())) {
 				continue;
 			}
