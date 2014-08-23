@@ -110,12 +110,13 @@ public class Location {
 		return em.createNamedQuery("Location.findAllLocations", Location.class).getResultList();
 	}
 	
+	@SuppressWarnings("unchecked")
 	public static List<Location> getResult(String queryId, EntityManager em) {
-		String SQL_GET_RESULTS2 = "select distinct location.* from location left join (select l.* from memory_table mt left join all_data l on l.l_id=mt.location_id"
-				+ "	where mt.query_n=? order by l.l_id, l.pg_name) result on location.id=result.l_id";
-		List<Location> r = em.createNativeQuery(SQL_GET_RESULTS2, Location.class).setParameter(1, queryId).getResultList();
-		return r;
-		
+		String query = "select location.* from location join "
+				+ " (select distinct(l.l_id) from memory_table mt left join all_data l on l.l_id=mt.location_id"
+				+ " where mt.query_n=? order by l.l_id, l.pg_name) result"
+				+ " on location.id=result.l_id;";
+		return em.createNativeQuery(query, Location.class).setParameter(1, queryId).getResultList();
 	}
 	
 	@Override
