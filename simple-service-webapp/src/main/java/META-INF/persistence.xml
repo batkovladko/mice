@@ -5,11 +5,10 @@
 	<persistence-unit name="simple-service-webapp"
 		transaction-type="RESOURCE_LOCAL">
 		<provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
-		<class>org.persistence.Admin</class>
-		<class>org.persistence.PropertyGroups</class>
-		<class>org.persistence.Location</class>
-		<class>org.persistence.Property</class>
-		<class>org.persistence.LocationProperties</class>
+		<class>bg.mice.data.model.PropertyGroups</class>
+		<class>bg.mice.data.model.Location</class>
+		<class>bg.mice.data.model.Property</class>
+		<class>bg.mice.data.model.LocationProperties</class>
 		<properties>
 			<property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver" />
 			<!-- property name="javax.persistence.jdbc.url" value="jdbc:mysql://50.31.138.79:3306/micehost_mice?useInformationSchema=true"/-->

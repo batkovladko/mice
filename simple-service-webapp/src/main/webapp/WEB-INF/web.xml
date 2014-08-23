@@ -10,7 +10,7 @@
 		<servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
 		<init-param>
 			<param-name>javax.ws.rs.Application</param-name>
-			<param-value>bg.filterapp.services.App</param-value>
+			<param-value>bg.mice.config.App</param-value>
 		</init-param>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
@@ -69,7 +69,7 @@
 		<url-pattern>/ImageService</url-pattern>
 	</servlet-mapping>
 	<listener>
-		<listener-class>bg.filterapp.ApplicationContextListener</listener-class>
+		<listener-class>bg.mice.ApplicationContextListener</listener-class>
 	</listener>
 	<context-param>
 		<param-name>DEV_PICTURES_FOLDER</param-name>
@@ -108,14 +108,14 @@
 	</context-param>
 	<context-param>
 		<param-name>MODE</param-name>
-		<param-value>PROD</param-value>
+		<param-value>dev</param-value>
 	</context-param>
 
 	<servlet>
 		<description></description>
 		<display-name>Search</display-name>
 		<servlet-name>Search</servlet-name>
-		<servlet-class>services.SearchService</servlet-class>
+		<servlet-class>bg.mice.services.SearchService</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>Search</servlet-name>
