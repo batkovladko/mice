@@ -3,9 +3,9 @@
 
 TODO REFACTORING
 ===============================================================================
-1. Remove unused java classes - done
-2. REST Services union - the same approcah :
-	a) LocationService & LocationRoute, UpdateLocationService AddNewLocationService. Should be merged in LocationRoute
+1. Remove unused java classes - done!
+2. REST Services union - the same approach : .
+	a) LocationService & LocationRoute, UpdateLocationService AddNewLocationService. Should be merged in LocationRoute - Done!.
 	b) Elements - switch to use of Location DTO
 	c) bg.mice.data.dto.LocationDTO & LocationPropertiesDTO vs bg.mice.services.LocationJSON & bg.mice.services.LocationAddPropertiesJSON 
 2. Remove unused html and js resources

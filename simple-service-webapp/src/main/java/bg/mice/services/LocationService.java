@@ -1,21 +1,20 @@
 package bg.mice.services;
 
 import static bg.mice.ApplicationContextListener.getPicturesFolder;
+import static bg.mice.helpers.ResponseUtils.buildRestBadRequest;
+import static bg.mice.helpers.ResponseUtils.buildRestCustomError;
+import static bg.mice.helpers.ResponseUtils.buildRestServerError;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.BadRequestException;
 
 import org.apache.commons.fileupload.FileItem;
@@ -25,38 +24,34 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import bg.mice.config.App;
 import bg.mice.data.dto.LocationAddPropertiesJSON;
 import bg.mice.data.dto.LocationJSON;
 import bg.mice.data.model.Location;
 import bg.mice.data.model.LocationProperties;
 import bg.mice.data.model.PropertyGroups;
-import bg.mice.helpers.ResponseUtils;
+import bg.mice.services.locations.LocationValidationResponse;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-public class LocationService extends HttpServlet {
+public class LocationService extends Route {
 	public static final String INPUT_FILE = "file";
 	public static final String INPUT_FORM_DATA = "formData";
 
-	private static final long serialVersionUID = 1L;
-
-	static final int MAX_FILE_SIZE = 1024 * 1024 * 2;
 	protected Gson gson = new GsonBuilder().create();
 
-	protected List<FileItem> validateInput(HttpServletRequest request, HttpServletResponse response,
-			boolean fileIsMandatory) throws FileUploadException, IOException {
+	protected LocationValidationResponse validateInput(HttpServletRequest request, boolean fileIsMandatory)
+			throws FileUploadException, IOException {
 		boolean isMultipart = ServletFileUpload.isMultipartContent(request);
 
 		if (!isMultipart && fileIsMandatory) {
-			buildBadRequest(response, "Missing file!");
-			return null;
+			return new LocationValidationResponse(buildRestBadRequest("Missing file!"));
 		}
 
 		DiskFileItemFactory factory = new DiskFileItemFactory();
-		ServletContext servletContext = this.getServletConfig().getServletContext();
 
-		File repository = (File) servletContext.getAttribute("javax.servlet.context.tempdir");
+		File repository = (File) request.getServletContext().getAttribute("javax.servlet.context.tempdir");
 		factory.setRepository(repository);
 
 		ServletFileUpload upload = new ServletFileUpload(factory);
@@ -65,24 +60,22 @@ public class LocationService extends HttpServlet {
 		if (items.size() >= 2) {
 			FileItem fileItem = getItemWithName(INPUT_FILE, items);
 			if (fileItem == null && fileIsMandatory) {
-				buildServerError(response, "Missing file!");
-				return null;
+				return new LocationValidationResponse(buildRestServerError("Missing file!"));
 			}
-			if (fileItem != null && fileItem.getSize() > MAX_FILE_SIZE) {
-				String errorMessage = String.format("Too bih image file. Max allowed [%d], actuall [%s]", MAX_FILE_SIZE, fileItem.getSize());
-				buildCustomError(451, errorMessage, response);
-				return null;
+			if (fileItem != null && fileItem.getSize() > App.MAX_FILE_SIZE) {
+				String errorMessage = String.format("Too big image file. Max allowed [%d], actuall [%s]",
+						App.MAX_FILE_SIZE, fileItem.getSize());
+				return new LocationValidationResponse(buildRestCustomError(451, errorMessage));
 			} else {
 				FileItem formData = getItemWithName(INPUT_FORM_DATA, items);
 				if (formData == null || StringUtils.isEmpty(formData.getString())) {
-					buildServerError(response, "Missing or empty formData");
-					return null;
+					return new LocationValidationResponse(buildRestServerError("Missing or empty formData"));
 				} else {
-					return items;
+					return new LocationValidationResponse(items);
 				}
 			}
 		}
-		return null;
+		return new LocationValidationResponse(null, null);
 	}
 
 	protected void persistNewLocation(LocationJSON inputLocation, InputStream image) throws IOException {
@@ -182,38 +175,6 @@ public class LocationService extends HttpServlet {
 		}
 	}
 
-	public static void buildBadRequest(HttpServletResponse response, String error) throws IOException {
-		response.addHeader("error", error);
-		response.getWriter().println(error);
-		response.setStatus(HttpURLConnection.HTTP_BAD_REQUEST);
-	}
-
-	public static void buildNotFound(HttpServletResponse response, String error) throws IOException {
-		response.addHeader("error", error);
-		response.getWriter().println(error);
-		response.setStatus(HttpURLConnection.HTTP_NOT_FOUND);
-	}
-
-	public static void buildServerError(HttpServletResponse response, String error) throws IOException {
-		buildServerError(response, error, true);
-	}
-	
-	public static void buildCustomError(int statusCode, String error, HttpServletResponse response) {
-		response.setStatus(statusCode);
-		if (error != null) {
-			response.addHeader(ResponseUtils.ERROR_MESSAGE_HEADER, error);
-		}
-	}
-
-	public static void buildServerError(HttpServletResponse response, String error, boolean printInTheResponse)
-			throws IOException {
-		response.addHeader("error", error);
-		if (printInTheResponse) {
-			response.getWriter().println(error);
-		}
-		response.setStatus(HttpURLConnection.HTTP_INTERNAL_ERROR);
-	}
-
 	protected FileItem getItemWithName(String name, List<FileItem> items) {
 		FileItem result = null;
 		for (FileItem fileItem : items) {
@@ -224,5 +185,4 @@ public class LocationService extends HttpServlet {
 		}
 		return result;
 	}
-
 }

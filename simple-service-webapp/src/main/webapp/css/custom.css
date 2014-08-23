@@ -65,6 +65,7 @@
 
 .errorMessage {
 	color: red;
+	margin-bottom: 5px;
 }
 
 .addNewProperty {

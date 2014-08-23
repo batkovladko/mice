@@ -1,9 +1,6 @@
 package bg.mice.services;
 
-import static bg.mice.ApplicationContextListener.getConnectionString;
-import static bg.mice.ApplicationContextListener.getPass;
 import static bg.mice.ApplicationContextListener.getPicturesFolder;
-import static bg.mice.ApplicationContextListener.getUsername;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -30,8 +27,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import bg.mice.ApplicationContextListener;
 import bg.mice.data.model.Location;
+import bg.mice.helpers.ResponseUtils;
 
 /**
  * Servlet implementation class ImageService
@@ -74,7 +71,7 @@ public class ImageService extends HttpServlet {
 			}
 		} catch (Exception e) {
 			logger.error("Error during serving an image", e);
-			AddNewLocationService.buildServerError(response, e.getMessage(), false);
+			ResponseUtils.buildServerError(response, e.getMessage(), false);
 		}
 	}
 

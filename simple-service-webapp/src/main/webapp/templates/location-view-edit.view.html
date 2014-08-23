@@ -65,7 +65,14 @@
 				loading.style.display = "none";
 			} else {
 				loading.style.display = "none";
-				alert("Грешка по време на промяна на обект.\n Моля свържете се със системен програмист." );
+				var errorCode = Utils.getErrorCode(iFrame.innerHTML);
+				var scope = angular.element($('#formBody')).scope();
+				if (451 == errorCode) {
+					document.getElementById("errorMessage").innerHTML = "Снимката надвишава максималния разрешен размер от 2MB.";
+				} else {
+					console.log("Error during update of location : " + errorCode);
+					alert("Грешка по време на промяна на обект.\n Моля свържете се със системен програмист." );
+				}
 			}
 		}
 	};
@@ -114,7 +121,7 @@
 			<img src="images/loading.gif" ng-show="locationsLoading" height="30" width="30"/>
 		</div>
 	
-		<form name="updateLocation"  enctype="multipart/form-data" id="updateLocation" action="api/v1/updatelocation" method="POST">
+		<form name="updateLocation"  enctype="multipart/form-data" id="updateLocation" action="api/v1/update-locations" method="POST">
 			<input type="hidden" id="formData" name="formData" value="">
 			<input type="hidden" id="id" name="id" value="">
 			<div id="status"></div>
@@ -135,11 +142,15 @@
 					</td>
 				</table>
 			<div class="panel-body" id="formBody"></div>
-			<span style="margin-left:20px">
-				<button type="button" class="btn btn-default" id="submitButton"
-					onclick="redirect()" disabled="disabled">Запази</button>
-				<img src="images/loading.gif" id="loading" height="30" width="30"
+
+			<div style="padding-left: 15px">
+				<div id="errorMessage" class="errorMessage"></div>
+				<span>
+					<button type="button" class="btn btn-default" id="submitButton"
+						onclick="redirect()" disabled="disabled">Запази</button> <img
+					src="images/loading.gif" id="loading" height="30" width="30"
 					style='display: none; valign: top' />
-			</span>
+				</span>
+			</div>
 		</form>
 	</div>

@@ -1,6 +1,9 @@
-package bg.mice.services;
+package bg.mice.services.locations;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
@@ -9,10 +12,12 @@ import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -21,18 +26,24 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.apache.commons.fileupload.FileItem;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import bg.mice.data.dto.Elements;
+import bg.mice.data.dto.LocationJSON;
 import bg.mice.data.model.Location;
 import bg.mice.data.model.LocationProperties;
 import bg.mice.helpers.ResponseUtils;
+import bg.mice.services.LocationService;
 
 @Path("locations")
-public class LocationsRoute extends Route {
+public class LocationsRoute extends LocationService {
 
 	@Context
 	private HttpServletRequest servletRequest;
-	@Context
-	private HttpServletResponse servletResponse;
+
+	private Logger logger = LogManager.getLogger(this.getClass());
 
 	@GET
 	@Path("{locationId}")
@@ -40,7 +51,7 @@ public class LocationsRoute extends Route {
 	public Response findById(@PathParam("locationId") final Long locationId) {
 		final EntityManager em = getEm();
 		final Location ep = em.find(Location.class, locationId);
-		
+
 		if (ep != null) {
 			Response response = Response.ok().entity(ep).build();
 			return response;
@@ -77,32 +88,44 @@ public class LocationsRoute extends Route {
 		}
 	}
 
-	// @POST
-	// @Consumes("application/json")
-	// public Response postLocation(final LocationJSON locationJson) {
-	// final EntityManager em = getEm();
-	// em.getTransaction().begin();
-	// try {
-	// final Location newLocation = new Location();
-	// newLocation.setName(locationJson.getName());
-	// em.persist(newLocation);
-	// for (LocationAddPropertiesJSON property : locationJson
-	// .getProperties()) {
-	// LocationProperties locationProperty = new LocationProperties();
-	// locationProperty.setValue(property.getValue());
-	// locationProperty.setLocation(newLocation);
-	// locationProperty.setGroup(em.find(PropertyGroups.class,
-	// Long.parseLong(property.getName())));
-	// em.persist(locationProperty);
-	// }
-	// em.getTransaction().commit();
-	// return Response.ok().build();
-	// } catch (Exception e) {
-	// e.printStackTrace();
-	// em.getTransaction().rollback();
-	// return Response.serverError().build();
-	// }
-	// }
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+	 *      response)
+	 */
+	@POST
+	public Response add() throws IOException, IOException {
+		InputStream imageFile = null;
+
+		try {
+			// Check that we have a file upload request
+		
+			LocationValidationResponse validationResult = validateInput(servletRequest, true);
+			
+			if (validationResult.getItems() == null) {
+				return ResponseUtils.buildRestResponseWithBody(HttpURLConnection.HTTP_OK, "Metadata: errorCode="
+						+ (validationResult.getError() != null ? validationResult.getError().getStatus() : "-1") + ";");
+			}
+
+			FileItem fileItem = getItemWithName(INPUT_FILE, validationResult.getItems());
+			FileItem dataItem = getItemWithName(INPUT_FORM_DATA, validationResult.getItems());
+			LocationJSON location = gson.fromJson(URLDecoder.decode(dataItem.getString(), "UTF-8"), LocationJSON.class);
+
+			location.setImageName(fileItem.getName());
+			imageFile = fileItem.getInputStream();
+
+			persistNewLocation(location, imageFile);
+			return ResponseUtils.buildRestResponseWithBody(HttpURLConnection.HTTP_CREATED, "success");
+		} catch (Exception e) {
+			logger.error("Error during adding location", e);
+			return ResponseUtils.buildRestServerError(e.getMessage());
+		} finally {
+			if (imageFile != null) {
+				imageFile.close();
+			}
+		}
+	}
+
+	
 
 	@DELETE
 	@Path("{id}")

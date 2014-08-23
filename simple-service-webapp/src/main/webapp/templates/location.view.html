@@ -132,7 +132,7 @@
 </script>
 <body>
 		<div class="panel panel-default">
-		<form name="newLocation" id="newLocation" name="newLocation" role="form" enctype="multipart/form-data" method="POST" action="api/v1/addnewlocation" novalidate>
+		<form name="newLocation" id="newLocation" name="newLocation" role="form" enctype="multipart/form-data" method="POST" action="api/v1/locations" novalidate>
 			<input type="hidden" id="formData" name="formData" value="">
 			<div id="status"></div>
 			<div class="panel-heading">
@@ -153,12 +153,16 @@
 			</div>
 
 			<div class="panel-body" id="formBody"></div>
-			<span id="errorMessage" class="errorMessage"></span>
-			<div>
-				<button type="button" class="btn btn-default" id="submitButton"
-					onclick="redirect()" ng-disabled="locationsLoading==true || newLocation.$pristine || (newLocation.$dirty && newLocation.$invalid)">Запази</button>
-				<img src="images/loading.gif" id="loading" height="30" width="30"
+
+			<div style="padding-left: 15px">
+				<div id="errorMessage" class="errorMessage"></div>
+				<span>
+					<button type="button" class="btn btn-default" id="submitButton"
+						onclick="redirect()"
+						ng-disabled="locationsLoading==true || newLocation.$pristine || (newLocation.$dirty && newLocation.$invalid)">Запази</button>
+					<img src="images/loading.gif" id="loading" height="30" width="30"
 					style='display: none; valign: top' />
+				</span>
 			</div>
 		</form>
 	</div>
