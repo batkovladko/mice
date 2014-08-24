@@ -189,3 +189,6 @@
 .searchResultCreated {
 	color: gray;
 }
+.searchResultTDTile {
+	padding-bottom: 5px;
+}
