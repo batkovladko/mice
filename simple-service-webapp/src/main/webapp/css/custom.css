@@ -59,12 +59,12 @@
 }
 
 .invalidControl {
-	background-color: red;
+	border-color: red;
 	color: yellow;
 }
 
 .errorMessage {
-	color: red;
+	color: white;
 	margin-bottom: 5px;
 }
 
@@ -107,7 +107,7 @@
 	margin-bottom: 10px;
 }
 .childDiv2 {
-	color: blue;
+	color: #bf5a16;
 }
 .parentFilter {
 	margin-bottom: 20px;
@@ -116,7 +116,8 @@
 	margin-left: 400px;
 }
 .tooltipFilter {
-	background-color: lightyellow;
+	background-color: #2b3e50;
+	color: lightgray;
 	position: absolute;
 	width: 350px;
 	min-height:30px;
@@ -126,11 +127,11 @@
 	margin: 0 0 0 0px;
 	padding: 10px 10px 10px 10px;
 	display: inline;
-	border: 1px solid gray;
-	border-radius: 5px;
+	border: 1px solid lightgray;
+	border-radius: 10px;
 	word-wrap: break-word;
 	overflow-y: hidden ;
-	box-shadow: 0px 10px 5px #888888;
+	box-shadow: 1px 1px #888888;
 }
 
 .freeFiltersSection {
@@ -152,7 +153,7 @@
 	margin-bottom: 20px;
 	padding: 2px 5px 2px 5px;
 	border: 1px solid lightgray;
-	color: blue;
+	color: #bf5a16;
 }
 
 .attributeValue {
@@ -162,8 +163,9 @@
 	padding: 5px;
 }
 .attributeHover {
+	color: #2b3e50;
     background:#eee;
-    border: 2px dashed #000;
+    border: 1px dashed #2b3e50;
 }
 .attributeHoverNotAllowed {
     background:red;
